@@ -3,6 +3,13 @@ uuid = "babc3d20-cd49-4f60-a736-a8f9c08892d3"
 authors = ["evalparse <zhuojia.dai@gmail.com>"]
 version = "0.1.0"
 
+[deps]
+Blosc = "a74b3585-a348-5f62-a45c-50e91977d574"
+CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+JLSO = "9da8a3cd-07a3-59c0-a743-3fdc52c30d11"
+Missings = "e1d29d7a-bbdc-5cf2-9ac0-f12de2c33e28"
+
 [compat]
 julia = "1"
 
