@@ -7,7 +7,12 @@ using CSV, DataFrames, Blosc, JLSO, Base.GC
 # use 12 threads
 Blosc.set_num_threads(6)
 
-@time a = CSV.read("C:/data/Performance_All/Performance_2010Q3.txt", delim = '|', header = false);
+@time a = CSV.read(
+"C:/data/Performance_All/Performance_2010Q3.txt",
+delim = '|',
+header = false,
+copycols=true
+);
 GC.gc()
 @time metadatas = savejdf(a, "c:/data/large.jdf");
 GC.gc()
@@ -18,7 +23,7 @@ GC.gc()
 using Revise
 
 using JLSO, JDF
-metadatas = JLSO.load("c:/data/large.meta.jlso")["data"];
+@time metadatas = JLSO.load("c:/data/large.meta.jlso")["data"];
 GC.gc()
 
 @time a2 = loadjdf("c:/data/large.jdf", metadatas);
