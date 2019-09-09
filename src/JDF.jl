@@ -7,6 +7,7 @@ using JLSO: JLSO
 using CSV:CSV
 using Missings:Missings
 using Base: _string_n
+using StatsBase:rle, inverse_rle
 
 export savejdf, loadjdf, nonmissingtype, gf, iow, ior, compress_then_write
 export column_loader!, gf2
@@ -153,7 +154,7 @@ column_loader!(buffer, ::Type{Union{Missing, T}}, io, metadata) where T = begin
 	Tmeta = metadata.Tmeta
 
 	t_pre = column_loader!(buffer, Tmeta.type, io, Tmeta)
-	t = t_pre |> allowmissing	
+	t = t_pre |> allowmissing
 	# read the missings as bool
 	m = column_loader(
 		Bool,
@@ -164,17 +165,120 @@ column_loader!(buffer, ::Type{Union{Missing, T}}, io, metadata) where T = begin
 	t
 end
 
+# perform a RLE
 compress_then_write(::Type{String}, b::Array{String}, io) = begin
-	# now write the bytes
-	ncw = sizeof.(b)
-	bbc = Blosc.compress(ncw)
-	ncw_compressed = write(io, bbc)
 
 	# write the string one by one
-	write.(Ref(io), b);
+	# do a Run-length encoding (RLE)
+	previous_b = b[1]
+	cnt = 1
+	lens = Int[]
+	str_lens = Int[]
+	for i = 2:length(b)
+		if b[i] != previous_b
+			push!(str_lens, write(io, previous_b))
+			push!(lens, cnt)
+			#push!(str_lens, sizeof(previous_b))
+			cnt = 0
+			previous_b = b[i]
+		end
+		cnt += 1
+	end
+
+	# reach the end: two situation
+	# 1) it's a new element, so write it
+	# 2) it's an existing element. Also write it
+	push!(str_lens, write(io, previous_b))
+	push!(lens, cnt)
+	#push!(str_lens, sizeof(previous_b))
+
+
+	@assert sum(lens) == length(b)
+
+	str_lens_compressed = Blosc.compress(str_lens)
+	str_lens_bytes = write(io, str_lens_compressed)
+
+	lens_compressed = Blosc.compress(lens)
+	rle_bytes = write(io, lens_compressed)
 
 	# return metadata
-	return (string_compressed_bytes = sum(ncw), string_len_bytes = length(bbc), type = String)
+	return (string_compressed_bytes = sum(str_lens),
+		string_len_bytes = str_lens_bytes,
+		rle_bytes = rle_bytes,
+		rle_len = length(str_lens),
+		type = String)
+end
+
+
+# load a string column
+"""
+	metadata should consists of length, compressed byte size of string-lengths,
+	string content lengths
+"""
+column_loader!(buffer, ::Type{String}, io::IOStream, metadata) = begin
+	println("")
+	println("")
+	println("-----------------------START: loading string---------------------")
+
+	print("1. read strings into buffer: ")
+	# read the string-lengths
+	@time readbytes!(io, buffer, metadata.string_compressed_bytes)
+	long_str = String(copy(buffer[1:metadata.string_compressed_bytes]))
+
+	print("2. read string lengths: ")
+	# read the string-lengths
+	@time readbytes!(io, buffer, metadata.string_len_bytes)
+	str_lens = Blosc.decompress(Int, buffer)
+
+	print("3.decompress count buffer: ")
+	@time readbytes!(io, buffer, metadata.rle_bytes)
+	@time counts = Blosc.decompress(Int, buffer)
+
+	# read the strings-lengths
+	print("4. inverse sle")
+	@time rle_substrings = Vector{SubString{String}}(undef, length(counts))
+	j = 1
+	@time for (i, s) in enumerate(str_lens)
+		rle_substrings[i] = SubString(long_str, j, j + s - 1)
+		j += s
+	end
+	@time fnl_result = inverse_rle(rle_substrings, counts)
+	return fnl_result
+
+
+
+	# # loop
+	# i = 1
+	# #j = 0
+	# ptr_to_string_in_bytes = pointer(buffer)
+	# # this is to ensure that the pointers are all different
+	# #return str_lens
+	# print("4. make it into string ")
+	# @time long_str = String(copy(buffer[1:metadata.string_compressed_bytes]));
+	# # @time reconstituted_strings = [Base._string_n(s) for s in str_lens]
+	# # return reconstituted_strings
+	# print("5. pre alllocate ")
+	# off = 1 ;
+	# #@time substrings = [(nxt = off+len; s = SubString(long_str, off, nxt-1); off = nxt; s) for len in str_lens]
+	# @time substrings = Vector{SubString{String}}(undef, length(str_lens))
+	# j = 1
+	# print("6. set strings ")
+	# @time for (i,s) in enumerate(str_lens)
+	# 	substrings[i] = SubString(long_str, j, j + s - 1)
+	# 	j += s
+	# end
+	# @time for string_byte_size in str_lens
+	# 	unsafe_copyto!(
+	# 		reconstituted_strings[i] |> pointer,
+	# 		ptr_to_string_in_bytes,
+	# 		string_byte_size)
+	# 	ptr_to_string_in_bytes += string_byte_size
+	#
+	#     i += 1
+	# end
+	println("-----------------------EMD: loading string-----------------------")
+	substrings
+	#reconstituted_strings
 end
 
 column_loader!(buffer, ::Type{Missing}, io, metadata) = nothing
@@ -193,89 +297,5 @@ column_loader!(buffer, ::Type{Missing}, io, metadata) = nothing
 # 	end
 # end
 # size(a::LongStringVector) = size(a.long_str)
-
-# load a column
-"""
-	metadata should consists of length, compressed byte size of string-lengths,
-	string content lengths
-"""
-
-column_loader!(buffer, ::Type{String}, io::IOStream, metadata) = begin
-	println("")
-	println("")
-	println("-----------------------START: loading string---------------------")
-
-	print("1. read string lengths into buffer: ")
-	# read the string-lengths
-	@time readbytes!(io, buffer, metadata.string_len_bytes)
-
-	print("2.decompress buffer: ")
-	@time str_lens = Blosc.decompress(Int, buffer)
-
-	# read the strings-lengths
-	print("3.read long string: ")
-	@time readbytes!(io, buffer, metadata.string_compressed_bytes)
-
-	# loop
-	i = 1
-	#j = 0
-	ptr_to_string_in_bytes = pointer(buffer)
-	# this is to ensure that the pointers are all different
-	#return str_lens
-	print("4. make it into string ")
-	@time long_str = String(copy(buffer[1:metadata.string_compressed_bytes]));
-	# @time reconstituted_strings = [Base._string_n(s) for s in str_lens]
-	# return reconstituted_strings
-	print("5. pre alllocate ")
-	off = 1 ;
-	#@time substrings = [(nxt = off+len; s = SubString(long_str, off, nxt-1); off = nxt; s) for len in str_lens]
-	@time substrings = Vector{SubString{String}}(undef, length(str_lens))
-	j = 1
-	print("6. set strings ")
-	@time for (i,s) in enumerate(str_lens)
-		substrings[i] = SubString(long_str, j, j + s - 1)
-		j += s
-	end
-	# @time for string_byte_size in str_lens
-	# 	unsafe_copyto!(
-	# 		reconstituted_strings[i] |> pointer,
-	# 		ptr_to_string_in_bytes,
-	# 		string_byte_size)
-	# 	ptr_to_string_in_bytes += string_byte_size
-	#
-	#     i += 1
-	# end
-	println("-----------------------EMD: loading string-----------------------")
-	substrings
-	#reconstituted_strings
-end
-# column_loader!(buffer, ::Type{String}, io::IOStream, metadata) = begin
-# 	# load the lengths
-# 	print("1.read into buffer: ")
-# 	@time readbytes!(io, buffer, metadata.string_len_bytes)
-# 	print("2.decompress buffer: ")
-# 	@time str_lens = Blosc.decompress(Int, buffer)
-#
-# 	# load every as a one big string
-# 	# this is FAST
-# 	#long_str = readbytes!(io, buffer, metadata.string_compressed_bytes)
-# 	print("3.read long string: ")
-# 	@time long_str = readbytes!(io, buffer, metadata.string_compressed_bytes)
-# 	return str_lens
-# 	print("4.allocate string arary: ")
-# 	@time res = Vector{String}(undef, length(str_lens))
-# 	i = 1
-# 	ptr_buffer = pointer(buffer)
-# 	print("5. populate string_array: ")
-# 	@time for s in str_lens
-# 		res[i] = unsafe_string(ptr_buffer, s)
-# 		ptr_buffer += s
-# 		i+=1
-# 	end
-# 	println("-----------------------EMD: loading string-----------------------")
-#
-# 	# the tricky part is making this fast
-# 	return res
-# end
 
 end # module

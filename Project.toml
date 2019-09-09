@@ -11,6 +11,7 @@ JLD2 = "033835bb-8acc-5ee8-8aae-3f567f8a3819"
 JLSO = "9da8a3cd-07a3-59c0-a743-3fdc52c30d11"
 Missings = "e1d29d7a-bbdc-5cf2-9ac0-f12de2c33e28"
 Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
+StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 WebIO = "0f1e0344-ec1d-5b48-a673-e5cf874b6c29"
 
 [compat]

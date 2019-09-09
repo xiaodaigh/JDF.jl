@@ -6,7 +6,8 @@ using JDF, CSV, DataFrames
 
 #b = Array(a.FL_DATE);
 
-b = coalesce.(Array(a[:Column31]), "")
+#b = coalesce.(Array(a[:Column31]), "")
+b = Array(a[:Column31]);
 
 
 io = iow()
