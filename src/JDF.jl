@@ -236,12 +236,17 @@ column_loader!(buffer, ::Type{String}, io::IOStream, metadata) = begin
 
 	# read the strings-lengths
 	print("4. inverse sle")
-	@time rle_substrings = Vector{SubString{String}}(undef, length(counts))
+
 	j = 1
+	#@time rle_substrings = Vector{SubString{String}}(undef, length(counts))
+	@time rle_substrings = Vector{String}(undef, length(counts))
 	@time for (i, s) in enumerate(str_lens)
-		rle_substrings[i] = SubString(long_str, j, j + s - 1)
+		#rle_substrings[i] = SubString(long_str, j, j + s - 1)
+		rle_substrings[i] = long_str[j:j + s - 1]
 		j += s
 	end
+	# helps with GC
+	long_str = ""
 	@time fnl_result = inverse_rle(rle_substrings, counts)
 	return fnl_result
 

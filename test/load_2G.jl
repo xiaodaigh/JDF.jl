@@ -8,11 +8,15 @@ using CSV, DataFrames, Blosc, JLSO, Base.GC
 Blosc.set_num_threads(6)
 
 @time a = CSV.read(
-"C:/data/Performance_All/Performance_2010Q3.txt",
-delim = '|',
-header = false,
-copycols=true
+    "C:/data/Performance_All/Performance_2010Q3.txt",
+    delim = '|',
+    header = false
 );
+
+ind = sort(1:size(a,1), by = x->rand())
+
+a = a[ind, !]
+
 GC.gc()
 @time metadatas = savejdf(a, "c:/data/large.jdf");
 GC.gc()
@@ -20,9 +24,7 @@ GC.gc()
 @time JLSO.save("c:/data/large.meta.jlso", metadatas)
 GC.gc()
 
-using Revise
-
-using JLSO, JDF
+using Revise, JLSO, JDF
 @time metadatas = JLSO.load("c:/data/large.meta.jlso")["data"];
 GC.gc()
 
