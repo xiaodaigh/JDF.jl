@@ -4,6 +4,8 @@ using CSV, DataFrames, Feather
 
 @time a = CSV.read("c:/data/a.feather");
 
+@time pmetadatas = psavejdf(a, "c:/data/a.jdf");
+
 @time metadatas = savejdf(a, "c:/data/a.jdf");
 #a = nothing
 @time a2 = loadjdf("c:/data/a.jdf", metadatas);

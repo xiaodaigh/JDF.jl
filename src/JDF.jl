@@ -8,9 +8,78 @@ using CSV:CSV
 using Missings:Missings
 using Base: _string_n
 using StatsBase:rle, inverse_rle
+using BufferedStreams
 
 export savejdf, loadjdf, nonmissingtype, gf, iow, ior, compress_then_write
-export column_loader!, gf2
+export column_loader!, gf2, psavejdf
+
+import Base.Threads.@spawn
+
+using Blosc
+
+import Base:size, show, getindex, setindex!, eltype
+
+export CmpVector
+
+mutable struct CmpVector{T} <: AbstractVector{T}
+	compressed::Vector{UInt8}
+	value::Vector{T}
+	inited::Bool
+	size::Union{Tuple, Nothing}
+end
+
+CmpVector{T}(compressed::Vector{UInt8}) where T = begin
+	CmpVector{T}(compressed, Vector{T}(undef, 0), false, nothing)
+end
+
+CmpVector(value::Vector{T}) where T = begin
+	CmpVector{T}(Blosc.compress(value), Vector{T}(undef, 0), false, size(value))
+end
+
+Base.eltype(cv::CmpVector{T}) where T = eltype(cv.value)
+
+decompress(cv::CmpVector{T}) where T = begin
+	if !cv.inited
+		cv.value = Blosc.decompress(T, cv.compressed)
+		cv.inited = true
+	end
+	cv.value
+end
+
+compress(cv::CmpVector{T}) where T = begin
+	if cv.inited
+		cv.compressed = Blosc.compress(cv.value)
+		cv.inited = false
+		cv.value = Vector{T}(undef, 0)
+	end
+	cv
+end
+
+Base.size(pf::CmpVector{T}) where T = begin
+	if size != nothing
+		return size
+	else
+		value = decompress(pf)
+		size(value)
+	end
+end
+
+Base.show(io::IO, A::MIME"text/plain", pf::CmpVector{T}) where T = begin
+	if pf.inited
+		show(io, A, decompress(pf))
+	else
+		show(io, A, "Compressed; not shown until first access; or CmpVectors.decompress(cv) is run")
+	end
+end
+
+Base.getindex(pf::CmpVector{T}, i...) where T = begin
+	decompress(pf)[i...]
+end
+
+Base.setindex!(cv::CmpVector{T}, i...) where T = begin
+	val = decompress(cv)
+	setindex!(val, i...)
+end
 
 Blosc.set_num_threads(6)
 
@@ -48,13 +117,41 @@ compress_then_write(T, b, io) = begin
 	return (len=res, type=T)
 end
 
+psavejdf(df, outfile) = begin
+	"""
+		save a DataFrames to the outfile
+	"""
+	#io  = open(outfile, "w")
+    pmetadatas = Any[missing for i in 1:length(names(df))]
+    #for (name, b) in zip(names(df), eachcol(df))
+	if !isdir(outfile)
+		mkpath(outfile)
+	end
+	ios = BufferedOutputStream.(open.(joinpath.(outfile, string.(names(df))), Ref("w")))
+
+	for i in 1:length(names(df))
+        #el = @elapsed push!(metadatas, compress_then_write(Array(b), io))
+		#println("Start: "*string(Threads.threadid()))
+		pmetadatas[i] = Threads.@spawn compress_then_write(Array(df[!,i]), ios[i])
+		#pmetadatas[i] = compress_then_write(Array(df[!,i]), ios[i])
+		#println("End: "*string(Threads.threadid()))
+        #println("saving $name took $el. Type: $(eltype(Array(b)))")
+    end
+	#close(io)
+	metadatas = fetch.(pmetadatas)
+	close.(ios)
+	(names = names(df), rows = size(df,1), metadatas = metadatas, pmetadatas = pmetadatas)
+end
+
 savejdf(df, outfile) = begin
 	"""
 		save a DataFrames to the outfile
 	"""
-	io  = open(outfile, "w")
+	io  = BufferedOutputStream(open(outfile, "w"))
     metadatas = Any[]
     for (name, b) in zip(names(df), eachcol(df))
+		println(name)
+		println(eltype(b))
         el = @elapsed push!(metadatas, compress_then_write(Array(b), io))
         println("saving $name took $el. Type: $(eltype(Array(b)))")
     end
@@ -77,7 +174,7 @@ end
 
 # load the data from file with a schema
 loadjdf(path, metadatas) = begin
-    io = open(path, "r")
+    io = BufferedInputStream(open(path, "r"))
     df = DataFrame()
 
 	# get the maximum number of bytes needs to read
@@ -87,18 +184,14 @@ loadjdf(path, metadatas) = begin
 	read_buffer = Vector{UInt8}(undef, bytes_needed)
 
     for (name, metadata) in zip(metadatas.names, metadatas.metadatas)
-		#println(name)
-		#println(metadata.type)
-		if (metadata.type == String) || (metadata.type == Union{Missing, String})
-			@time el = @elapsed res = column_loader!(read_buffer, metadata.type, io, metadata)
-			println("$el | loading $name | Type: $(metadata.type)")
-		else
-			el = @elapsed res = column_loader!(read_buffer, metadata.type, io, metadata)
-		end
-    	if res == nothing
+		println(name)
+		println(metadata)
+		if metadata.type == Missing
 			df[!,name] = Vector{Missing}(missing, metadatas.rows)
 		else
+			@time el = @elapsed res = column_loader!(read_buffer, metadata.type, io, metadata)
     		df[!,name] = res
+			println("$el | loading $name | Type: $(metadata.type)")
     	end
     end
  	close(io)
@@ -106,12 +199,10 @@ loadjdf(path, metadatas) = begin
 end
 
 # load bytes bytes from io decompress into type
-column_loader!(buffer, T::Type, io, metadata) = begin
-	if metadata.len > 0
-		readbytes!(io, buffer, metadata.len)
-	    return Blosc.decompress(T, buffer)
-	end
-	nothing
+column_loader!(buffer, ::Type{T}, io, metadata) where T = begin
+	readbytes!(io, buffer, metadata.len)
+    #return Blosc.decompress(T, buffer)
+	return CmpVector{T}(buffer)
 end
 
 compress_then_write(::Type{Bool}, b, io) = begin
@@ -148,21 +239,39 @@ compress_then_write(::Type{T}, b, io) where T >: Missing = begin
 	(Tmeta = metadata, missingmeta = metadata2, type = eltype(b))
 end
 
-
-column_loader!(buffer, ::Type{Union{Missing, T}}, io, metadata) where T = begin
+column_loader!(buffer, ::Type{Union{Missing, String}}, io, metadata) = begin
 	# read the content
 	Tmeta = metadata.Tmeta
 
 	t_pre = column_loader!(buffer, Tmeta.type, io, Tmeta)
-	t = t_pre |> allowmissing
+	#t = t_pre
 	# read the missings as bool
 	m = column_loader(
 		Bool,
 		io,
 		metadata.missingmeta)
 	#return t_pre
-	t[m] .= missing
-	t
+	t_pre[m] .= missing
+	println("hello")
+	t_pre
+end
+
+
+column_loader!(buffer, ::Type{Union{Missing, T}}, io, metadata) where T = begin
+	# read the content
+	Tmeta = metadata.Tmeta
+
+	@time t_pre = column_loader!(buffer, Tmeta.type, io, Tmeta) |> allowmissing
+	#t = t_pre
+	# read the missings as bool
+	@time m = column_loader(
+		Bool,
+		io,
+		metadata.missingmeta)
+	#return t_pre
+	@time t_pre[m] .= missing
+	println("hello2")
+	t_pre
 end
 
 # perform a RLE
@@ -215,7 +324,7 @@ end
 	metadata should consists of length, compressed byte size of string-lengths,
 	string content lengths
 """
-column_loader!(buffer, ::Type{String}, io::IOStream, metadata) = begin
+column_loader!(buffer, ::Type{String}, io, metadata) = begin
 	println("")
 	println("")
 	println("-----------------------START: loading string---------------------")
@@ -239,7 +348,7 @@ column_loader!(buffer, ::Type{String}, io::IOStream, metadata) = begin
 
 	j = 1
 	#@time rle_substrings = Vector{SubString{String}}(undef, length(counts))
-	@time rle_substrings = Vector{String}(undef, length(counts))
+	@time rle_substrings = Vector{Union{String, Missing}}(undef, length(counts))
 	@time for (i, s) in enumerate(str_lens)
 		#rle_substrings[i] = SubString(long_str, j, j + s - 1)
 		rle_substrings[i] = long_str[j:j + s - 1]
@@ -249,38 +358,6 @@ column_loader!(buffer, ::Type{String}, io::IOStream, metadata) = begin
 	long_str = ""
 	@time fnl_result = inverse_rle(rle_substrings, counts)
 	return fnl_result
-
-
-
-	# # loop
-	# i = 1
-	# #j = 0
-	# ptr_to_string_in_bytes = pointer(buffer)
-	# # this is to ensure that the pointers are all different
-	# #return str_lens
-	# print("4. make it into string ")
-	# @time long_str = String(copy(buffer[1:metadata.string_compressed_bytes]));
-	# # @time reconstituted_strings = [Base._string_n(s) for s in str_lens]
-	# # return reconstituted_strings
-	# print("5. pre alllocate ")
-	# off = 1 ;
-	# #@time substrings = [(nxt = off+len; s = SubString(long_str, off, nxt-1); off = nxt; s) for len in str_lens]
-	# @time substrings = Vector{SubString{String}}(undef, length(str_lens))
-	# j = 1
-	# print("6. set strings ")
-	# @time for (i,s) in enumerate(str_lens)
-	# 	substrings[i] = SubString(long_str, j, j + s - 1)
-	# 	j += s
-	# end
-	# @time for string_byte_size in str_lens
-	# 	unsafe_copyto!(
-	# 		reconstituted_strings[i] |> pointer,
-	# 		ptr_to_string_in_bytes,
-	# 		string_byte_size)
-	# 	ptr_to_string_in_bytes += string_byte_size
-	#
-	#     i += 1
-	# end
 	println("-----------------------EMD: loading string-----------------------")
 	substrings
 	#reconstituted_strings

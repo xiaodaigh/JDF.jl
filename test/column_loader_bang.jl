@@ -1,14 +1,15 @@
 using Revise
 using JDF, CSV, DataFrames
-#a = gf()
+# @time a = gf()
 
-@time a = CSV.read("C:/data/Performance_All/Performance_2010Q3.txt", delim = '|', header = false);
+# 2G file
+@time a = CSV.read(
+    "C:/data/Performance_All/Performance_2010Q3.txt",
+    delim = '|',
+    header = false
+);
 
-#b = Array(a.FL_DATE);
-
-#b = coalesce.(Array(a[:Column31]), "")
-b = Array(a[:Column31]);
-
+b = Array(a[!, :YEAR]);
 
 io = iow()
 @time metadata = compress_then_write(b, io)
@@ -17,8 +18,7 @@ io = iow()
 close(io)
 
 
-using JDF
-using CSV, DataFrames
+using Revise, JDF, CSV, DataFrames
 # using JLSO
 # metadata = JLSO.load("C:/data/metatmp")["data"]
 buffer = rand(UInt8, 30_000_000)
