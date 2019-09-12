@@ -9,10 +9,10 @@ using Missings:Missings
 using Base: _string_n
 using StatsBase:rle, inverse_rle
 using BufferedStreams
-using RLEVectors
+using WeakRefStrings
 
 export savejdf, loadjdf, nonmissingtype, gf, iow, ior, compress_then_write
-export column_loader!, gf2, psavejdf
+export column_loader!, gf2, psavejdf, column_loader
 
 import Base.Threads.@spawn
 
@@ -43,6 +43,7 @@ decompress(cv::CmpVector{T}) where T = begin
 	if !cv.inited
 		cv.value = Blosc.decompress(T, cv.compressed)
 		cv.inited = true
+		cv.size = size(cv.value)
 	end
 	cv.value
 end
@@ -56,14 +57,7 @@ compress(cv::CmpVector{T}) where T = begin
 	cv
 end
 
-Base.size(pf::CmpVector{T}) where T = begin
-	if size != nothing
-		return size
-	else
-		value = decompress(pf)
-		size(value)
-	end
-end
+Base.size(pf::CmpVector{T}) where T = size(decompress(pf))
 
 Base.show(io::IO, A::MIME"text/plain", pf::CmpVector{T}) where T = begin
 	if pf.inited
@@ -108,8 +102,6 @@ some_elm(::Type{Missing}) = missing
 some_elm(::Type{String}) = ""
 
 compress_then_write(b, io) = compress_then_write(eltype(b), b, io)
-
-compress_then_write(::Type{Missing}, b, io) = (len=0, type=Missing)
 
 compress_then_write(T, b, io) = begin
 	bbc = Blosc.compress(b)
@@ -182,7 +174,7 @@ loadjdf(path, metadatas) = begin
 	bytes_needed = maximum(get_bytes.(metadatas.metadatas))
 
 	# preallocate once
-	read_buffer = Vector{UInt8}(undef, bytes_needed)
+	#read_buffer = Vector{UInt8}(undef, bytes_needed)
 
     for (name, metadata) in zip(metadatas.names, metadatas.metadatas)
 		println(name)
@@ -190,7 +182,11 @@ loadjdf(path, metadatas) = begin
 		if metadata.type == Missing
 			df[!,name] = Vector{Missing}(missing, metadatas.rows)
 		else
-			@time el = @elapsed res = column_loader!(read_buffer, metadata.type, io, metadata)
+			@time el = @elapsed res = column_loader(metadata.type, io, metadata)
+			println(length(res))
+			if(length(res)) == 14
+				return res
+			end
     		df[!,name] = res
 			println("$el | loading $name | Type: $(metadata.type)")
     	end
@@ -204,6 +200,11 @@ column_loader!(buffer, ::Type{T}, io, metadata) where T = begin
 	readbytes!(io, buffer, metadata.len)
     #return Blosc.decompress(T, buffer)
 	return CmpVector{T}(buffer)
+end
+
+column_loader(::Type{T}, io, metadata) where T = begin
+	buffer = Vector{UInt8}(undef, metadata.len)
+	column_loader!(buffer, T, io, metadata)
 end
 
 compress_then_write(::Type{Bool}, b, io) = begin
@@ -220,14 +221,6 @@ column_loader(T::Type{Bool}, io, metadata) = begin
 	Bool.(Blosc.decompress(UInt8, buffer))
 end
 
-column_loader!(buffer, T::Type{Bool}, io, metadata) = begin
-	# Bool are saved as UInt8
-	read!(io, buffer)
-	res = Blosc.decompress(UInt8, buffer)
-	Bool.(res)
-end
-
-
 compress_then_write(::Type{T}, b, io) where T >: Missing = begin
 	S = nonmissingtype(eltype(b))
 	b_S = coalesce.(b, some_elm(S))
@@ -240,38 +233,19 @@ compress_then_write(::Type{T}, b, io) where T >: Missing = begin
 	(Tmeta = metadata, missingmeta = metadata2, type = eltype(b))
 end
 
-column_loader!(buffer, ::Type{Union{Missing, String}}, io, metadata) = begin
+column_loader(::Type{Union{Missing, String}}, io, metadata) = begin
 	# read the content
 	Tmeta = metadata.Tmeta
 
-	t_pre = column_loader!(buffer, Tmeta.type, io, Tmeta)
-	#t = t_pre
+	t_pre = column_loader(Tmeta.type, io, Tmeta)
+
 	# read the missings as bool
 	m = column_loader(
 		Bool,
 		io,
 		metadata.missingmeta)
-	#return t_pre
+
 	t_pre[m] .= missing
-	println("hello")
-	t_pre
-end
-
-
-column_loader!(buffer, ::Type{Union{Missing, T}}, io, metadata) where T = begin
-	# read the content
-	Tmeta = metadata.Tmeta
-
-	@time t_pre = column_loader!(buffer, Tmeta.type, io, Tmeta) |> allowmissing
-	#t = t_pre
-	# read the missings as bool
-	@time m = column_loader(
-		Bool,
-		io,
-		metadata.missingmeta)
-	#return t_pre
-	@time t_pre[m] .= missing
-	println("hello2")
 	t_pre
 end
 
@@ -305,10 +279,10 @@ compress_then_write(::Type{String}, b::Array{String}, io) = begin
 
 	@assert sum(lens) == length(b)
 
-	str_lens_compressed = Blosc.compress(str_lens)
+	str_lens_compressed = Blosc.compress(UInt32.(str_lens))
 	str_lens_bytes = write(io, str_lens_compressed)
 
-	lens_compressed = Blosc.compress(lens)
+	lens_compressed = Blosc.compress(UInt64.(lens))
 	rle_bytes = write(io, lens_compressed)
 
 	# return metadata
@@ -316,7 +290,9 @@ compress_then_write(::Type{String}, b::Array{String}, io) = begin
 		string_len_bytes = str_lens_bytes,
 		rle_bytes = rle_bytes,
 		rle_len = length(str_lens),
-		type = String)
+		type = String,
+		orig_len = length(b),
+		len = sum(str_lens) + str_lens_bytes + rle_bytes)
 end
 
 
@@ -325,60 +301,35 @@ end
 	metadata should consists of length, compressed byte size of string-lengths,
 	string content lengths
 """
-column_loader!(buffer, ::Type{String}, io, metadata) = begin
+
+column_loader(::Type{String}, io, metadata) = begin
 	println("")
 	println("")
 	println("-----------------------START: loading string---------------------")
 
 	print("1. read strings into buffer: ")
 	# read the string-lengths
+
+	buffer = Vector{UInt8}(undef, metadata.string_compressed_bytes)
 	@time readbytes!(io, buffer, metadata.string_compressed_bytes)
-	long_str = String(copy(buffer[1:metadata.string_compressed_bytes]))
+	#return String(buffer)
 
-	print("2. read string lengths: ")
 	# read the string-lengths
-	@time readbytes!(io, buffer, metadata.string_len_bytes)
-	str_lens = Blosc.decompress(Int, buffer)
+	buffer2 = Vector{UInt8}(undef, metadata.string_len_bytes)
+	@time readbytes!(io, buffer2, metadata.string_len_bytes)
 
-	print("3.decompress count buffer: ")
-	@time readbytes!(io, buffer, metadata.rle_bytes)
-	@time counts = Blosc.decompress(Int, buffer)
+	buffer3 = Vector{UInt8}(undef, metadata.rle_bytes)
+	@time readbytes!(io, buffer3, metadata.rle_bytes)
 
-	# read the strings-lengths
-	print("4. inverse sle")
-
-	j = 1
-	#@time rle_substrings = Vector{SubString{String}}(undef, length(counts))
-	@time rle_substrings = Vector{Union{String, Missing}}(undef, length(counts))
-	@time for (i, s) in enumerate(str_lens)
-		#rle_substrings[i] = SubString(long_str, j, j + s - 1)
-		rle_substrings[i] = long_str[j:j + s - 1]
-		j += s
-	end
-	# helps with GC
-	long_str = ""
-	@time fnl_result = inverse_rle(rle_substrings, counts)
-	println("-----------------------EMD: loading string-----------------------")
-	return fnl_result
+	lengths = Blosc.decompress(UInt32, buffer2)
+	offsets = vcat(0, cumsum(lengths[1:end-1]))
+	# TODO RLE it
 	
-	#return RLEVector([rle_substrings], cumsum(counts))
+	#res = StringArray{String, 1}(buffer, vcat(1, cumsum(Blosc.decompress(UInt64, buffer3))[1:end-1]) .-1,  )
+	res = StringArray{String, 1}(buffer, offsets, lengths)
 end
 
-column_loader!(buffer, ::Type{Missing}, io, metadata) = nothing
-
-# struct LongStringVector{String} <:AbstractVector{String}
-# 	long_str::String
-# 	cum_ind::Vector{Int}
-# end
-#
-# length(a::LongStringVector) = length(a.cum_ind)
-# get_index(a::LongStringVector, ind) = begin
-# 	if ind == 1
-# 		long_str[1:a.cum_ind[1]]
-# 	else
-# 		long_str[a.cum_ind[ind-1]+1:a.cum_ind[ind]]
-# 	end
-# end
-# size(a::LongStringVector) = size(a.long_str)
+compress_then_write(::Type{Missing}, b, io) = (orig_len=length(b), len=0, type=Missing)
+column_loader(::Type{Missing}, io, metadata) = Vector{Missing}(missing, metadata.orig_len)
 
 end # module
