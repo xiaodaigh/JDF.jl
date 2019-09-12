@@ -9,7 +9,7 @@ using JDF, CSV, DataFrames
     header = false
 );
 
-b = Array(a[!, :YEAR]);
+b = Array(a[!, :Column3]);
 
 io = iow()
 @time metadata = compress_then_write(b, io)
@@ -18,10 +18,11 @@ io = iow()
 close(io)
 
 
-using Revise, JDF, CSV, DataFrames
+using Revise
+using JDF, CSV, DataFrames
 # using JLSO
 # metadata = JLSO.load("C:/data/metatmp")["data"]
-buffer = rand(UInt8, 30_000_000)
+buffer = rand(UInt8, 9_000_000)
 
 io = ior()
 @time oo = column_loader!(buffer, eltype(b), io, metadata);

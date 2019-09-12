@@ -9,6 +9,7 @@ using Missings:Missings
 using Base: _string_n
 using StatsBase:rle, inverse_rle
 using BufferedStreams
+using RLEVectors
 
 export savejdf, loadjdf, nonmissingtype, gf, iow, ior, compress_then_write
 export column_loader!, gf2, psavejdf
@@ -357,10 +358,10 @@ column_loader!(buffer, ::Type{String}, io, metadata) = begin
 	# helps with GC
 	long_str = ""
 	@time fnl_result = inverse_rle(rle_substrings, counts)
-	return fnl_result
 	println("-----------------------EMD: loading string-----------------------")
-	substrings
-	#reconstituted_strings
+	return fnl_result
+	
+	#return RLEVector([rle_substrings], cumsum(counts))
 end
 
 column_loader!(buffer, ::Type{Missing}, io, metadata) = nothing
