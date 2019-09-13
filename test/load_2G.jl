@@ -12,20 +12,10 @@ Blosc.set_num_threads(6)
 );
 GC.gc()
 
-# t = time()
-# @time metadatas = psavejdf(a, "c:/data/large.dir.jdf");
-# time() - t
-# GC.gc()
-
-GC.gc()
-@time metadatas = savejdf(a, "c:/data/large.jdf");
-GC.gc()
-serialize("c:/data/large.meta", metadatas)
-
+@time metadatas = savejdf("c:/data/large.jdf", a);
 
 using Revise, JDF, DataFrames, Serialization
-metadatas = deserialize("c:/data/large.meta")
-@time a2 = loadjdf("c:/data/large.jdf", metadatas);
+@time a2 = loadjdf("c:/data/large.jdf");
 GC.gc()
 
 all(names(a) .== names(a2))
