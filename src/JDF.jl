@@ -36,8 +36,11 @@ CmpVector(value::Vector{T}) where T = begin
 	CmpVector{T}(Blosc.compress(value), Vector{T}(undef, 0), false, size(value))
 end
 
-type_compress!(df::DataFrame) = begin
+type_compress!(df::DataFrame; verbose = false) = begin
 	for n in names(df)
+		if verbose
+			println("Compressing $n")
+		end
 		df[!,n] = type_compress(Array(df[!,n]))
 	end
 	df

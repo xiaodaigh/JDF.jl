@@ -26,16 +26,16 @@ serialize("c:/data/large8.meta", metadatas)
 using Revise, JDF, DataFrames, Serialization
 metadatas = deserialize("c:/data/large8.meta")
 @time a2 = loadjdf("c:/data/large8.jdf", metadatas);
-before=Base.summarysize(a2)
+# before=Base.summarysize(a2)
 
-type_compress!(a2)
+@time type_compress!(a2, verbose = true)
 
-after=Base.summarysize(a2)
-
-before/after
+# after=Base.summarysize(a2)
+#
+# before/after
 
 GC.gc()
-@time metadatas = savejdf(a, "c:/data/large8c.jdf");
+@time metadatas = savejdf(a2, "c:/data/large8c.jdf");
 GC.gc()
 serialize("c:/data/large8c.meta", metadatas)
 
