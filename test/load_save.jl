@@ -27,7 +27,7 @@ metadatas = deserialize("c:/data/a.jls")
 @time savejdf("c:/data/a_p.jdf", a2)
 @time psavejdf(a2, "c:/data/a_p.jdf")
 
-a2 = loadjdf("c:/data/a_p.jdf")
+a2 = ploadjdf("c:/data/a_p.jdf")
 
 all(names(a) .== names(a2))
 all(skipmissing([all(a2[!,name] .== Array(a[!,name])) for name in names(a2)]))

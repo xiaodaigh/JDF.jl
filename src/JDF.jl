@@ -3,7 +3,6 @@ module JDF
 
 using Blosc: Blosc
 using DataFrames
-using JLSO: JLSO
 using CSV:CSV
 using Missings:Missings
 using StatsBase:rle, inverse_rle
@@ -17,30 +16,12 @@ import Base:size, show, getindex, setindex!, eltype
 import Base.Threads.@spawn
 
 export savejdf, loadjdf, nonmissingtype, gf, iow, ior, compress_then_write
-export column_loader!, gf2, psavejdf, type_compress!, type_compress
+export column_loader!, gf2, psavejdf, type_compress!, type_compress, ploadjdf
 
 include("type_compress.jl")
 
 Blosc.set_num_threads(6)
 
-gf() = begin
-	CSV.read("c:/data/AirOnTimeCSV/airOT198710.csv")
-end
-
-gf2() = begin
-	p = "c:/data/AirOnTimeCSV/"
-	f = joinpath.(p, readdir(p))
-	sort!(f, by = x->filesize(x), rev=true)
-	reduce(vcat, CSV.read.(f[1:100]))
-end
-
-iow() = begin
-	open("c:/data/bin.bin", "w")
-end
-
-ior() = begin
-	open("c:/data/bin.bin", "r")
-end
 
 some_elm(x) = zero(x)
 some_elm(::Type{Missing}) = missing
@@ -114,8 +95,6 @@ savejdf(outdir, df) = begin
 	fnl_metadata
 end
 
-
-
 # figure out from metadata how much space is allocated
 get_bytes(metadata) = begin
     if metadata.type == String
@@ -158,6 +137,8 @@ loadjdf(indir) = begin
 end
 
 ploadjdf(indir) = begin
+	println("parallel load not working yet")
+	return loadjdf(indir)
 	metadatas = deserialize(joinpath(indir,"metadata.jls"))
 
     df = DataFrame()
@@ -168,6 +149,7 @@ ploadjdf(indir) = begin
 	# preallocate once
 	read_buffer = Vector{UInt8}(undef, bytes_needed)
 
+	results = Any[]
     for (name, metadata) in zip(metadatas.names, metadatas.metadatas)
 		# println(name)
 		# println(metadata)
@@ -176,11 +158,16 @@ ploadjdf(indir) = begin
 			df[!,name] = Vector{Missing}(missing, metadatas.rows)
 		else
 			#el = @elapsed res = column_loader!(read_buffer, metadata.type, io, metadata)
-    		df[!,name] = column_loader!(read_buffer, metadata.type, io, metadata)
+    		#df[!,name] = column_loader!(read_buffer, metadata.type, io, metadata)
+			push!(results, (name = name, io = io, task = Threads.@spawn column_loader!(read_buffer, metadata.type, io, metadata)))
 			# println("$el | loading $name | Type: $(metadata.type)")
     	end
-		close(io)
     end
+
+	for result in results
+		df[!, result.name] = fetch(result.task)
+		close(result.io)
+	end
  	df
 end
 
