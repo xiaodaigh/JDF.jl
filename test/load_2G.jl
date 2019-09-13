@@ -12,10 +12,10 @@ Blosc.set_num_threads(6)
 );
 GC.gc()
 
-t = time()
-@time metadatas = psavejdf(a, "c:/data/large.dir.jdf");
-time() - t
-GC.gc()
+# t = time()
+# @time metadatas = psavejdf(a, "c:/data/large.dir.jdf");
+# time() - t
+# GC.gc()
 
 GC.gc()
 @time metadatas = savejdf(a, "c:/data/large.jdf");

@@ -5,6 +5,17 @@ using Serialization:serialize,deserialize
 
 @time a = gf()
 
+@time metadatas = savejdf(a, "c:/data/a_pre_compress.jdf");
+
+before = Base.summarysize(a)
+
+type_compress!(a)
+
+after = Base.summarysize(a)
+
+before/after
+2+2
+
 @time metadatas = savejdf(a, "c:/data/a.jdf");
 serialize("c:/data/a.jls", metadatas)
 
@@ -16,17 +27,4 @@ metadatas = deserialize("c:/data/a.jls")
 all(names(a) .== names(a2))
 all(skipmissing([all(a2[!,name] .== Array(a[!,name])) for name in names(a2)]))
 
-ok(buffer, ::Type{Int}, io, metadata) = begin
-	println("")
-	#readbytes!(io, buffer, metadata.len)
-    #return Blosc.decompress(T, buffer)
-end
-
-ok(buffer, ::Type{String}, io::IOStream, metadata) = begin
-	println("")
-	println("")
-	println("-----------------------START: loading string---------------------")
-end
-
-ok(1,Int,2,2)
-ok(1,String,2,2)
+Base.summarysize(a2)
