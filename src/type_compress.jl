@@ -68,4 +68,5 @@ end
 type_compress(v::Vector{Float64}) = Vector{Float32}(v)
 type_compress(v::Vector{Union{Missing, Float64}}) = Vector{Union{Missing, Float64}}(v)
 
+type_compress(v::Vector{Missing}) = v
 type_compress(v) = v

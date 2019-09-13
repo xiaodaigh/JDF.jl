@@ -11,9 +11,10 @@ using StatsBase:rle, inverse_rle
 using BufferedStreams
 using RLEVectors
 
-include("type_compress.jl")
 export savejdf, loadjdf, nonmissingtype, gf, iow, ior, compress_then_write
-export column_loader!, gf2, psavejdf
+export column_loader!, gf2, psavejdf, type_compress!, type_compress
+
+include("type_compress.jl")
 
 import Base.Threads.@spawn
 
@@ -44,6 +45,8 @@ decompress(cv::CmpVector{T}) where T = begin
 	if !cv.inited
 		cv.value = Blosc.decompress(T, cv.compressed)
 		cv.inited = true
+		cv.compressed = Vector{UInt}([0])
+		cv.size=size(cv.value)
 	end
 	cv.value
 end
@@ -57,14 +60,7 @@ compress(cv::CmpVector{T}) where T = begin
 	cv
 end
 
-Base.size(pf::CmpVector{T}) where T = begin
-	if size != nothing
-		return size
-	else
-		value = decompress(pf)
-		size(value)
-	end
-end
+Base.size(v::CmpVector{T}) where T = size(decompress(v))
 
 Base.show(io::IO, A::MIME"text/plain", pf::CmpVector{T}) where T = begin
 	if pf.inited

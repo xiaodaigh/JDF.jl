@@ -1,32 +1,30 @@
 using Revise
 using JDF
-using CSV, DataFrames, JLSO
+using CSV, DataFrames
+using Serialization:serialize,deserialize
 
 @time a = gf()
 
+@time metadatas = savejdf(a, "c:/data/a_pre_compress.jdf");
+
+before = Base.summarysize(a)
+
+@time type_compress!(a; verbose = true)
+
+after = Base.summarysize(a)
+
+before/after
+2+2
 
 @time metadatas = savejdf(a, "c:/data/a.jdf");
-JLSO.save("c:/data/a.metadata.jlso", metadatas)
+serialize("c:/data/a.jls", metadatas)
 
 using Revise
-using JLSO, DataFrames, JDF
-metadatas = JLSO.load("c:/data/a.metadata.jlso")["data"]
+using DataFrames, JDF
+metadatas = deserialize("c:/data/a.jls")
 @time a2 = loadjdf("c:/data/a.jdf", metadatas);
 
 all(names(a) .== names(a2))
 all(skipmissing([all(a2[!,name] .== Array(a[!,name])) for name in names(a2)]))
 
-ok(buffer, ::Type{Int}, io, metadata) = begin
-	println("")
-	#readbytes!(io, buffer, metadata.len)
-    #return Blosc.decompress(T, buffer)
-end
-
-ok(buffer, ::Type{String}, io::IOStream, metadata) = begin
-	println("")
-	println("")
-	println("-----------------------START: loading string---------------------")
-end
-
-ok(1,Int,2,2)
-ok(1,String,2,2)
+Base.summarysize(a2)
