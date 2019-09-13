@@ -38,7 +38,7 @@ You can use the `psavejdf` function to save a `DataFrame` using parallel process
 type_compress!(a)
 ```
 
-The function looks at `Int*` columns and see if it can be safely "downgrade" to another `Int*` type with a smaller bits size. It will convert `Float64` to `Float32`.
+The function looks at `Int*` columns and see if it can be safely "downgraded" to another `Int*` type with a smaller bits size. It will convert `Float64` to `Float32`.
 
 `String` compression is planned.
 
