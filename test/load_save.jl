@@ -1,16 +1,16 @@
 using Revise
 using JDF
-using CSV, DataFrames, JLSO
+using CSV, DataFrames
+using Serialization:serialize,deserialize
 
 @time a = gf()
 
-
 @time metadatas = savejdf(a, "c:/data/a.jdf");
-JLSO.save("c:/data/a.metadata.jlso", metadatas)
+serialize("c:/data/a.jls", metadatas)
 
 using Revise
-using JLSO, DataFrames, JDF
-metadatas = JLSO.load("c:/data/a.metadata.jlso")["data"]
+using DataFrames, JDF
+metadatas = deserialize("c:/data/a.jls")
 @time a2 = loadjdf("c:/data/a.jdf", metadatas);
 
 all(names(a) .== names(a2))

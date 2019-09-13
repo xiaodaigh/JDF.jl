@@ -10,15 +10,14 @@ using Base: _string_n
 using StatsBase:rle, inverse_rle
 using BufferedStreams
 using WeakRefStrings
+using Blosc
 
 export savejdf, loadjdf, nonmissingtype, gf, iow, ior, compress_then_write
 export column_loader!, gf2, psavejdf, column_loader
 
 import Base.Threads.@spawn
-
-using Blosc
-
-import Base:size, show, getindex, setindex!, eltype
+import Base: size, show, getindex, setindex!, eltype
+import Missings: allowmissing, disallowmissing
 
 export CmpVector
 
@@ -36,6 +35,11 @@ end
 CmpVector(value::Vector{T}) where T = begin
 	CmpVector{T}(Blosc.compress(value), Vector{T}(undef, 0), false, size(value))
 end
+
+type_compress(df::DataFrame) = type_compress!.(eachcol(df))
+
+type_compress!(v::Vector{T}) where T <: Union{Int128, Int64, Int32} = compress(df)
+
 
 Base.eltype(cv::CmpVector{T}) where T = eltype(cv.value)
 
@@ -55,6 +59,16 @@ compress(cv::CmpVector{T}) where T = begin
 		cv.value = Vector{T}(undef, 0)
 	end
 	cv
+end
+
+Missings.allowmissing(cv::CmpVector{T}) where T = begin
+	decompress(cv)
+	allowmissing(cv.value)
+end
+
+Missings.disallowmissing(cv::CmpVector{T}) where T = begin
+	decompress(cv)
+	disallowmissing(cv.value)
 end
 
 Base.size(pf::CmpVector{T}) where T = size(decompress(pf))
@@ -143,10 +157,10 @@ savejdf(df, outfile) = begin
 	io  = BufferedOutputStream(open(outfile, "w"))
     metadatas = Any[]
     for (name, b) in zip(names(df), eachcol(df))
-		println(name)
-		println(eltype(b))
+		# println(name)
+		# println(eltype(b))
         el = @elapsed push!(metadatas, compress_then_write(Array(b), io))
-        println("saving $name took $el. Type: $(eltype(Array(b)))")
+        # println("saving $name took $el. Type: $(eltype(Array(b)))")
     end
 	close(io)
 	(names = names(df), rows = size(df,1), metadatas = metadatas)
@@ -177,18 +191,14 @@ loadjdf(path, metadatas) = begin
 	#read_buffer = Vector{UInt8}(undef, bytes_needed)
 
     for (name, metadata) in zip(metadatas.names, metadatas.metadatas)
-		println(name)
-		println(metadata)
+		# println(name)
+		# println(metadata)
 		if metadata.type == Missing
 			df[!,name] = Vector{Missing}(missing, metadatas.rows)
 		else
-			@time el = @elapsed res = column_loader(metadata.type, io, metadata)
-			println(length(res))
-			if(length(res)) == 14
-				return res
-			end
+			el = @elapsed res = column_loader(metadata.type, io, metadata)
     		df[!,name] = res
-			println("$el | loading $name | Type: $(metadata.type)")
+			# println("$el | loading $name | Type: $(metadata.type)")
     	end
     end
  	close(io)
@@ -233,11 +243,11 @@ compress_then_write(::Type{T}, b, io) where T >: Missing = begin
 	(Tmeta = metadata, missingmeta = metadata2, type = eltype(b))
 end
 
-column_loader(::Type{Union{Missing, String}}, io, metadata) = begin
+column_loader(::Type{Union{Missing, T}}, io, metadata) where T = begin
 	# read the content
 	Tmeta = metadata.Tmeta
 
-	t_pre = column_loader(Tmeta.type, io, Tmeta)
+	t_pre = column_loader(Tmeta.type, io, Tmeta) |> allowmissing
 
 	# read the missings as bool
 	m = column_loader(
@@ -276,7 +286,6 @@ compress_then_write(::Type{String}, b::Array{String}, io) = begin
 	push!(lens, cnt)
 	#push!(str_lens, sizeof(previous_b))
 
-
 	@assert sum(lens) == length(b)
 
 	str_lens_compressed = Blosc.compress(UInt32.(str_lens))
@@ -303,28 +312,26 @@ end
 """
 
 column_loader(::Type{String}, io, metadata) = begin
-	println("")
-	println("")
-	println("-----------------------START: loading string---------------------")
-
-	print("1. read strings into buffer: ")
-	# read the string-lengths
-
 	buffer = Vector{UInt8}(undef, metadata.string_compressed_bytes)
-	@time readbytes!(io, buffer, metadata.string_compressed_bytes)
+	readbytes!(io, buffer, metadata.string_compressed_bytes)
 	#return String(buffer)
 
 	# read the string-lengths
 	buffer2 = Vector{UInt8}(undef, metadata.string_len_bytes)
-	@time readbytes!(io, buffer2, metadata.string_len_bytes)
+	readbytes!(io, buffer2, metadata.string_len_bytes)
 
 	buffer3 = Vector{UInt8}(undef, metadata.rle_bytes)
-	@time readbytes!(io, buffer3, metadata.rle_bytes)
+	readbytes!(io, buffer3, metadata.rle_bytes)
 
-	lengths = Blosc.decompress(UInt32, buffer2)
-	offsets = vcat(0, cumsum(lengths[1:end-1]))
-	# TODO RLE it
-	
+	counts = Blosc.decompress(UInt64, buffer3)
+
+	str_lens = Blosc.decompress(UInt32, buffer2)
+
+	lengths = inverse_rle(str_lens, counts)
+	offsets = inverse_rle(vcat(0, cumsum(str_lens[1:end-1])), counts)
+
+	#return (buffer, counts, lengths, offsets)
+
 	#res = StringArray{String, 1}(buffer, vcat(1, cumsum(Blosc.decompress(UInt64, buffer3))[1:end-1]) .-1,  )
 	res = StringArray{String, 1}(buffer, offsets, lengths)
 end

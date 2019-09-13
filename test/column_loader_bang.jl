@@ -1,29 +1,23 @@
 using Revise
 using JDF, CSV, DataFrames
-# @time a = gf()
+@time a = gf()
 
 # 2G file
-@time a = CSV.read(
-    "C:/data/Performance_All/Performance_2010Q3.txt",
-    delim = '|',
-    header = false
-);
+# @time a = CSV.read(
+#     "C:/data/Performance_All/Performance_2010Q3.txt",
+#     delim = '|',
+#     header = false
+# );
 
-b = Array(a[!, :Column2]);
+b = Array(a[!, :DEP_TIME]);
 
 io = iow()
 @time metadata = compress_then_write(b, io)
-# using JLSO
-# JLSO.save("c:/data/metatmp", metadata)
 close(io)
 
 
 using Revise
 using JDF, CSV, DataFrames
-# using JLSO
-# metadata = JLSO.load("C:/data/metatmp")["data"]
-
-
 io = ior()
 @time oo = column_loader(eltype(b), io, metadata);
 close(io)
