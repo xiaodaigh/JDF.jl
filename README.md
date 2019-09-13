@@ -25,6 +25,12 @@ all(names(a2) .== names(a)) # true
 all(skipmissing([all(a2[!,name] .== Array(a[!,name])) for name in names(a2)])) #true
 ```
 
+### Save in parallel
+You can use the `psavejdf` function to save a `DataFrame` using parallel processes.
+```julia
+@time metadatas = psavejdf("c:/data/a.jdf", a)
+```
+
 ## Supported data types
 There is support for `String`, `Bool`, and `isbits` types i.e. `UInt*`, `Int*`, and `Float*` `Date*` types etc.  Restricting the types that JDF support is vital for simplicity.
 
