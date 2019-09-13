@@ -1,15 +1,15 @@
 using Revise
 using JDF, CSV, DataFrames
-# @time a = gf()
+@time a = gf()
 
 # 2G file
-@time a = CSV.read(
-    "C:/data/Performance_All/Performance_2010Q3.txt",
-    delim = '|',
-    header = false
-);
+# @time a = CSV.read(
+#     "C:/data/Performance_All/Performance_2010Q3.txt",
+#     delim = '|',
+#     header = false
+# );
 
-b = Array(a[!, :Column3]);
+b = Array(a[!, :ORIGIN_STATE_ABR]);
 
 io = iow()
 @time metadata = compress_then_write(b, io)
