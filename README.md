@@ -31,6 +31,17 @@ You can use the `psavejdf` function to save a `DataFrame` using parallel process
 @time metadatas = psavejdf("c:/data/a.jdf", a)
 ```
 
+### Additional functionality
+`DataFrame` sizes are out of control. A 2GB CSV file can easily take up 10G in RAM. So I have created a utility called `type_compress!(df)` to compress any `DataFrame` `df`.
+
+```julia
+type_compress!(a)
+```
+
+The function looks at `Int*` columns and see if it can be safely "downgrade" to another `Int*` type with a smaller bits size. It will convert `Float64` to `Float32`.
+
+`String` compression is planned.
+
 ## Supported data types
 There is support for `String`, `Bool`, and `isbits` types i.e. `UInt*`, `Int*`, and `Float*` `Date*` types etc.  Restricting the types that JDF support is vital for simplicity.
 
