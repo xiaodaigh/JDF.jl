@@ -126,6 +126,15 @@ gen_benchmark(dirpath, largest_file, outpath, data_label; delim = ',', header=tr
     )
     savefig(plot_read, joinpath(outpath, largest_file*"plot_read.png"))
 
+    plot_read_wo_csv_jlso = groupedbar(
+        repeat(["JDF.jl", "Feather.jl", "JLD2.jl"], inner = 2),
+        [jdf_read1, jdf_read2, feather_read1, feather_read2, jld2_read1, jld2_read2],
+        group = repeat(["1st", "2nd"], outer = 3),
+        ylab = "Seconds",
+        title = "Disk-format Read performance comparison \n Data: $data_label data \n Size: $(size(df)) filesize:$(round(filesize(joinpath(dirpath, largest_file))/1024^3, digits=1))GB \n Julia $(VERSION)"
+    )
+    savefig(plot_read_wo_csv_jlso, joinpath(outpath, largest_file*"plot_read_wo_csv_jlso.png"))
+
     plot_read_wo_jlso = groupedbar(
         repeat(["JDF.jl", "CSV.jl", "Feather.jl", "JLD2.jl"], inner = 2),
         [jdf_read1, jdf_read2, csv_read1, csv_read2, feather_read1, feather_read2, jld2_read1, jld2_read2],
@@ -156,5 +165,6 @@ sum_file_size(dir) = begin
     filter!(r -> r.ext != ".png", df)
     sort!(df, :ext)
     df[:pkg] = ["CSV.jl", "JDF.jl", "JLD2.jl", "JLSO.jl", "Feather.jl"]
+    sort!(df, :pkg)
     df
 end

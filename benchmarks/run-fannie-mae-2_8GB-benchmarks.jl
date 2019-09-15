@@ -30,4 +30,4 @@ p = plot(
     ylab = "Size (GB)",
     legend = false,
     title = "On-disk file Size for various formats\n $data_label data")
-savefig(p, joinpath(outpath, largest_file"_filesize.png"))
+savefig(p, joinpath(outpath, largest_file*"_filesize.png"))
