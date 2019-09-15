@@ -14,6 +14,7 @@ a = dataset("iris") |> DataFrame
 ```
 
 *Saving* and *Loading* data
+By default JDF loads and saves `DataFrame`s using parallel process
 ```julia
 @time metadatas = savejdf("c:/data/a.jdf", a)
 @time a2 = loadjdf("c:/data/a.jdf")
@@ -25,10 +26,12 @@ all(names(a2) .== names(a)) # true
 all(skipmissing([all(a2[!,name] .== Array(a[!,name])) for name in names(a2)])) #true
 ```
 
-### Save in parallel
-You can use the `psavejdf` function to save a `DataFrame` using parallel processes.
+### Save and load serially
+You can use the `ssavejdf` and `sloadjdf` function to save a `DataFrame` using
+serially, i.e. without using parallel processes.
 ```julia
-@time metadatas = psavejdf("c:/data/a.jdf", a)
+@time metadatas = ssavejdf("c:/data/a.jdf", a)
+@time metadatas = sloadjdf("c:/data/a.jdf")
 ```
 
 ### Additional functionality

@@ -5,20 +5,31 @@ using Blosc: Blosc
 using DataFrames
 using CSV:CSV
 using Missings:Missings
-using StatsBase:rle, inverse_rle
+using StatsBase:rle, inverse_rle, sample
 using BufferedStreams
 #using RLEVectors
 using WeakRefStrings
 using Blosc
 using Serialization:serialize, deserialize
+using StatsBase:rle, inverse_rle,countmap
 
 import Base:size, show, getindex, setindex!, eltype
-import Base.Threads.@spawn
+if VERSION >= v"1.3.0-rc1"
+	import Base.Threads: @spawn
+else
+	macro spawn(x)
+		println("parallel version do not work in < Julia 1.3")
+	end
+end
+# using RLEVectors
 
 export savejdf, loadjdf, nonmissingtype, gf, iow, ior, compress_then_write
-export column_loader!, gf2, psavejdf, type_compress!, type_compress, ploadjdf
+export column_loader!, gf2, ssavejdf, type_compress!, type_compress, sloadjdf
+export column_loader
 
+include("loadjdf.jl")
 include("type_compress.jl")
+include("compress_then_write-cate.jl")
 
 Blosc.set_num_threads(6)
 
@@ -38,10 +49,14 @@ compress_then_write(T, b, io) = begin
 	return (len=res, type=T)
 end
 
-psavejdf(outdir, df) = begin
-	"""
-		save a DataFrames to the outdir
-	"""
+"""
+	save a DataFrames to the outdir
+"""
+savejdf(outdir, df) = begin
+	if VERSION < v"1.3.0-rc1"
+		return ssavejdf(outdir, df)
+	end
+
 	#io  = open(outdir, "w")
     pmetadatas = Any[missing for i in 1:length(names(df))]
     #for (name, b) in zip(names(df), eachcol(df))
@@ -53,7 +68,7 @@ psavejdf(outdir, df) = begin
 	for i in 1:length(names(df))
         #el = @elapsed push!(metadatas, compress_then_write(Array(b), io))
 		#println("Start: "*string(Threads.threadid()))
-		pmetadatas[i] = Threads.@spawn compress_then_write(Array(df[!,i]), ios[i])
+		pmetadatas[i] = @spawn compress_then_write(Array(df[!,i]), ios[i])
 		#pmetadatas[i] = compress_then_write(Array(df[!,i]), ios[i])
 		#println("End: "*string(Threads.threadid()))
         #println("saving $name took $el. Type: $(eltype(Array(b)))")
@@ -62,13 +77,13 @@ psavejdf(outdir, df) = begin
 	metadatas = fetch.(pmetadatas)
 	close.(ios)
 
-	fnl_metadata = (names = names(df), rows = size(df,1), metadatas = metadatas, pmetadatas = pmetadatas)
+	fnl_metadata = (names = names(df), rows = size(df,1), metadatas = metadatas)#, pmetadatas = pmetadatas)
 
 	serialize(joinpath(outdir,"metadata.jls"), fnl_metadata)
 	fnl_metadata
 end
 
-savejdf(outdir, df) = begin
+ssavejdf(outdir, df::DataFrame) = begin
 	"""
 		serially save a DataFrames to the outdir
 	"""
@@ -108,67 +123,18 @@ get_bytes(metadata) = begin
     end
 end
 
-# load the data from file with a schema
-loadjdf(indir) = begin
-	metadatas = deserialize(joinpath(indir,"metadata.jls"))
 
-    df = DataFrame()
 
-	# get the maximum number of bytes needs to read
-	bytes_needed = maximum(get_bytes.(metadatas.metadatas))
 
-	# preallocate once
-	read_buffer = Vector{UInt8}(undef, bytes_needed)
 
-    for (name, metadata) in zip(metadatas.names, metadatas.metadatas)
-		# println(name)
-		# println(metadata)
-		io = BufferedInputStream(open(joinpath(indir,string(name)), "r"))
-		if metadata.type == Missing
-			df[!,name] = Vector{Missing}(missing, metadatas.rows)
-		else
-			el = @elapsed res = column_loader!(read_buffer, metadata.type, io, metadata)
-    		df[!,name] = res
-			# println("$el | loading $name | Type: $(metadata.type)")
-    	end
-		close(io)
-    end
- 	df
-end
+hasfieldnames(::Type{T}) where T = fieldnames(T) >= 1
 
-ploadjdf(indir) = begin
-	println("parallel load not working yet")
-	return loadjdf(indir)
-	metadatas = deserialize(joinpath(indir,"metadata.jls"))
 
-    df = DataFrame()
 
-	# get the maximum number of bytes needs to read
-	bytes_needed = maximum(get_bytes.(metadatas.metadatas))
 
-	# preallocate once
-	read_buffer = Vector{UInt8}(undef, bytes_needed)
-
-	results = Any[]
-    for (name, metadata) in zip(metadatas.names, metadatas.metadatas)
-		# println(name)
-		# println(metadata)
-		io = BufferedInputStream(open(joinpath(indir,string(name)), "r"))
-		if metadata.type == Missing
-			df[!,name] = Vector{Missing}(missing, metadatas.rows)
-		else
-			#el = @elapsed res = column_loader!(read_buffer, metadata.type, io, metadata)
-    		#df[!,name] = column_loader!(read_buffer, metadata.type, io, metadata)
-			push!(results, (name = name, io = io, task = Threads.@spawn column_loader!(read_buffer, metadata.type, io, metadata)))
-			# println("$el | loading $name | Type: $(metadata.type)")
-    	end
-    end
-
-	for result in results
-		df[!, result.name] = fetch(result.task)
-		close(result.io)
-	end
- 	df
+column_loader(t::Type{T}, io, metadata) where T = begin
+	buffer = Vector{UInt8}(undef, metadata.len)
+	column_loader!(buffer, t, io, metadata)
 end
 
 # load bytes bytes from io decompress into type
@@ -208,7 +174,7 @@ compress_then_write(::Type{T}, b, io) where T >: Missing = begin
 	b_m = ismissing.(b)
 	metadata2 = compress_then_write(eltype(b_m), b_m, io)
 
-	(Tmeta = metadata, missingmeta = metadata2, type = eltype(b))
+	(Tmeta = metadata, missingmeta = metadata2, type = eltype(b), len = max(metadata.len, metadata2.len))
 end
 
 column_loader!(buffer, ::Type{Union{Missing, T}}, io, metadata) where T = begin
@@ -225,6 +191,28 @@ column_loader!(buffer, ::Type{Union{Missing, T}}, io, metadata) where T = begin
 	#return t_pre
 	t_pre[m] .= missing
 	t_pre
+end
+
+
+compress_then_write(_, b::StringVector{T}, io) where T = compress_then_write(b, io)
+
+compress_then_write(b::StringVector{T}, io) where T = begin
+	fields = (getfield(b, n) for n in fieldnames(typeof(b)))
+	(metadata = [(eltype(f), write(io, Blosc.compress(f))) for f in fields], type = typeof(b))
+end
+
+column_loader(::Type{StringVector{T}}, io, metadata) where T = begin
+	# uncompress
+	args = Vector[]
+
+	# assign the buffer once
+	buffer = Vector{UInt8}(undef, maximum(x->x[2], metadata.metadata))
+
+	for (elm_type, compressed_bytes) in metadata.metadata
+		readbytes!(io, buffer, compressed_bytes)
+		push!(args, Blosc.decompress(elm_type, buffer))
+	end
+	metadata.type(args...)
 end
 
 # perform a RLE
@@ -268,7 +256,8 @@ compress_then_write(::Type{String}, b::Array{String}, io) = begin
 		string_len_bytes = str_lens_bytes,
 		rle_bytes = rle_bytes,
 		rle_len = length(str_lens),
-		type = String)
+		type = String,
+		len = max( sum(str_lens), str_lens_bytes, rle_bytes))
 end
 
 

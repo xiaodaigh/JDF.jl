@@ -9,25 +9,20 @@ using JDF, CSV, DataFrames
 #     header = false
 # );
 
-b = Array(a[!, :ORIGIN_STATE_ABR]);
+b = type_compress(Array(a[!, :ORIGIN]));
+
 
 io = iow()
 @time metadata = compress_then_write(b, io)
-# using JLSO
-# JLSO.save("c:/data/metatmp", metadata)
 close(io)
-
 
 using Revise
 using JDF, CSV, DataFrames
 # using JLSO
 # metadata = JLSO.load("C:/data/metatmp")["data"]
-buffer = rand(UInt8, 9_000_000)
 
 io = ior()
-@time oo = column_loader!(buffer, eltype(b), io, metadata);
+@time oo = column_loader(metadata.type, io, metadata);
 close(io)
-
-a = String(copy(buffer[1:metadata.string_compressed_bytes]));
 
 all(b.==oo)

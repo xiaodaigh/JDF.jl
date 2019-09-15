@@ -5,7 +5,7 @@ using Serialization:serialize,deserialize
 
 @time a = gf()
 
-@time metadatas = savejdf(a, "c:/data/a_pre_compress.jdf");
+@time metadatas = savejdf("c:/data/a_pre_compress.jdf", a);
 
 # before = Base.summarysize(a)
 #
@@ -16,18 +16,20 @@ using Serialization:serialize,deserialize
 # before/after
 # 2+2
 
-@time metadatas = savejdf(a, "c:/data/a.jdf");
-serialize("c:/data/a.jls", metadatas)
+@time savejdf("c:/data/a.jdf", a);
 
 using Revise
 using DataFrames, JDF
-metadatas = deserialize("c:/data/a.jls")
-@time a2 = loadjdf("c:/data/a.jdf", metadatas);
+@time a2 = loadjdf("c:/data/a.jdf");
+
+@time a2 = sloadjdf("c:/data/a.jdf");
+
+type_compress!(a2)
 
 @time savejdf("c:/data/a_p.jdf", a2)
-@time psavejdf(a2, "c:/data/a_p.jdf")
+@time ssavejdf("c:/data/a_p.jdf", a2)
 
-a2 = ploadjdf("c:/data/a_p.jdf")
+#a2 = ploadjdf("c:/data/a_p.jdf")
 
 all(names(a) .== names(a2))
 all(skipmissing([all(a2[!,name] .== Array(a[!,name])) for name in names(a2)]))
