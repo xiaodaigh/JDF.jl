@@ -13,8 +13,8 @@ using VegaDatasets, JDF, DataFrames
 a = dataset("iris") |> DataFrame
 ```
 
-*Saving* and *Loading* data
-By default JDF loads and saves `DataFrame`s using parallel process
+### *Saving* and *Loading* data
+By default JDF loads and saves `DataFrame`s using parallel process starting from Julia 1.3. For Julia < 1.3, it saves and loads using one thread only.
 ```julia
 @time metadatas = savejdf("c:/data/a.jdf", a)
 @time a2 = loadjdf("c:/data/a.jdf")
