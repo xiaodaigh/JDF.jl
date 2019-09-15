@@ -10,14 +10,14 @@ JDF stores a dataframe in a folder with each column stored as a separate file. T
 ```julia
 using VegaDatasets, JDF, DataFrames
 
-a = dataset("iris") |> DataFrame
+iris = dataset("iris") |> DataFrame
 ```
 
 ### *Saving* and *Loading* data
 By default JDF loads and saves `DataFrame`s using parallel process starting from Julia 1.3. For Julia < 1.3, it saves and loads using one thread only.
 ```julia
-@time metadatas = savejdf("c:/data/a.jdf", a)
-@time a2 = loadjdf("c:/data/a.jdf")
+@time metadatas = savejdf("c:/data/iris.jdf", a)
+@time a2 = loadjdf("c:/data/iris.jdf")
 ```
 
 Simple checks for correctness
@@ -30,8 +30,8 @@ all(skipmissing([all(a2[!,name] .== Array(a[!,name])) for name in names(a2)])) #
 You can use the `ssavejdf` and `sloadjdf` function to save a `DataFrame` using
 serially, i.e. without using parallel processes.
 ```julia
-@time metadatas = ssavejdf("c:/data/a.jdf", a)
-@time metadatas = sloadjdf("c:/data/a.jdf")
+@time metadatas = ssavejdf("c:/data/iris.jdf", a)
+@time metadatas = sloadjdf("c:/data/iris.jdf")
 ```
 
 ### Additional functionality
