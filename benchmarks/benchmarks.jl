@@ -115,7 +115,7 @@ gen_benchmark(dirpath, largest_file, outpath, data_label; delim = ',', header=tr
         ylab = "Seconds",
         title = "Disk-format Write performance comparison \n Data: $data_label data \n Size: $(size(df)) filesize:$(round(filesize(joinpath(dirpath, largest_file))/1024^3, digits=1))GB \n Julia $(VERSION)"
     )
-    savefig(plot_write, joinpath(outpath, largest_file*"plot_write_wo_jlso.png"))
+    savefig(plot_write_wo_jlso, joinpath(outpath, largest_file*"plot_write_wo_jlso.png"))
 
     plot_read = groupedbar(
         repeat(["JDF.jl", "CSV.jl", "Feather.jl", "JLD2.jl", "JLSO.jl"], inner = 2),
@@ -133,7 +133,7 @@ gen_benchmark(dirpath, largest_file, outpath, data_label; delim = ',', header=tr
         ylab = "Seconds",
         title = "Disk-format Read performance comparison \n Data: $data_label data \n Size: $(size(df)) filesize:$(round(filesize(joinpath(dirpath, largest_file))/1024^3, digits=1))GB \n Julia $(VERSION)"
     )
-    savefig(plot_read, joinpath(outpath, largest_file*"plot_read_wo_jlso.png"))
+    savefig(plot_read_wo_jlso, joinpath(outpath, largest_file*"plot_read_wo_jlso.png"))
 
     (write_perf, read_perf, dirpath, outpath, largest_file, df)
 end
