@@ -11,8 +11,8 @@ dirpath = "c:/data/AirOnTimeCSV/"
 largest_file = "airOT199302.csv"
 outpath = "c:/data/jdf-bench/airOT199302.csv"
 data_label = "Air On Time 199302"
-# delim = ','
-# header = true
+delim = ','
+header = true
 
 include("C:/Users/RTX2080/git/JDF/benchmarks/benchmarks.jl")
 @time res = gen_benchmark("c:/data/AirOnTimeCSV/", "airOT199302.csv", "c:/data/jdf-bench/airOT199302.csv", data_label)

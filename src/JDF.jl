@@ -3,7 +3,7 @@ module JDF
 
 using Blosc: Blosc
 using DataFrames
-using CSV:CSV
+#using CSV:CSV
 using Missings:Missings
 using StatsBase:rle, inverse_rle, sample
 using BufferedStreams
@@ -124,13 +124,7 @@ get_bytes(metadata) = begin
 end
 
 
-
-
-
 hasfieldnames(::Type{T}) where T = fieldnames(T) >= 1
-
-
-
 
 column_loader(t::Type{T}, io, metadata) where T = begin
 	buffer = Vector{UInt8}(undef, metadata.len)
