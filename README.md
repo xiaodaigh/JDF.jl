@@ -60,4 +60,5 @@ Although JDF is experimental, there a few tricks up Julia's sleeves. Firstly, th
 When saving a JDF, each vector is Blosc compressed (using the default settings) if possible; this includes all `T` and `Unions{Missing, T}` types where `T` is `isbits`. For `String` vectors, they are first converted to Run Length Encoding (RLE), and the lengths component in the RLE are `Blosc` compressed.
 
 ## Notes
+Julia 1.1 is not supported.
 Parallel read and write support is only available from Julia 1.3.
