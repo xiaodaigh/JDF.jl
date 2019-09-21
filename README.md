@@ -49,6 +49,17 @@ type_compress!(df, compress_float = true)
 
 `String` compression is _planned_ and will likely employ categorical encoding combined RLE encoding.
 
+## Benchmarks
+Here are some benchmarks [Fannie Mae Mortgage Data](https://docs.rapids.ai/datasets/mortgage-data). Please note that a reading of zero means that the method has failed to read or write.
+
+JDF is a decent performaner on both read and write and can achieve comparable performance to [R's {fst}](https://www.fstpackage.org/), once compiled. The JDF format also results in much smaller file size vs Feather.jl in this particular example (probably Feather.jl's inefficient storage of `Union{String, Missing}`).
+
+![](benchmarks/results/fannie-mae-read-Performance_2004Q3.txt.png)
+![](benchmarks/results/fannie-mae-write-Performance_2004Q3.txt.png)
+![](benchmarks/results/fannie-mae-filesize-Performance_2004Q3.txt.png)
+
+Please note that the benchmarks are obtained on Julia 1.3+. On earlier version of Julia where multi-threading isn't available, JDF is roughly 2x slower than as shown in the benchmarks.
+
 ## Supported data types
 There is support for `String`, `Bool`, and `isbits` types i.e. `UInt*`, `Int*`, and `Float*` `Date*` types etc.  Restricting the types that JDF support is vital for simplicity.
 

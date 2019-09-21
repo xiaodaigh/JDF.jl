@@ -3,7 +3,6 @@ module JDF
 
 using Blosc: Blosc
 using DataFrames
-#using CSV:CSV
 using Missings:Missings
 using StatsBase:rle, inverse_rle, sample
 using BufferedStreams
