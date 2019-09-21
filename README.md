@@ -74,4 +74,5 @@ When saving a JDF, each vector is Blosc compressed (using the default settings) 
 I will prioritize bugs fixes but once I consider the format is stable I will freeze development unless a bug is reported. So new features will be slow to come onboard. This is because I have other OSS commitments including [R's {disk.frame}](http:/diskframe.com).
 
 ## Notes
+Julia 1.1 is not supported.
 Parallel read and write support is only available from Julia 1.3.
