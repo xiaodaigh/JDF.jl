@@ -35,7 +35,7 @@ serially, i.e. without using parallel processes.
 ```
 
 ### Additional functionality: In memory `DataFrame` compression
-`DataFrame` sizes are out of control. A 2GB CSV file can easily take up 10GG in RAM. One can use the function `type_compress!(df)`  to compress any `df::DataFrame`. E.g.
+`DataFrame` sizes are out of control. A 2GB CSV file can easily take up 10GB in RAM. One can use the function `type_compress!(df)`  to compress any `df::DataFrame`. E.g.
 
 ```julia
 type_compress!(df)
