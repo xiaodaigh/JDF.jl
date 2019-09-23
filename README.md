@@ -10,7 +10,7 @@ JDF stores a dataframe in a folder with each column stored as a separate file. T
 ```julia
 using VegaDatasets, JDF, DataFrames
 
-iris = dataset("iris") |> DataFrame
+a = dataset("iris") |> DataFrame
 ```
 
 ### *Saving* and *Loading* data
