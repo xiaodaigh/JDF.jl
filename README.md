@@ -61,7 +61,7 @@ JDF is a decent performaner on both read and write and can achieve comparable pe
 Please note that the benchmarks are obtained on Julia 1.3+. On earlier version of Julia where multi-threading isn't available, JDF is roughly 2x slower than as shown in the benchmarks.
 
 ## Supported data types
-There is support for `String`, `Bool`, and `isbits` types i.e. `UInt*`, `Int*`, and `Float*` `Date*` types etc.  Restricting the types that JDF support is vital for simplicity.
+There is support for `String`, `Bool`, and `isbits` types i.e. `UInt*`, `Int*`, and `Float*` `Date*` types etc.  Restricting the types that JDF supports is vital for simplicity.
 
 Further support will be added for `CategoricalVectors` and `RLEVectors` in the future.
 
