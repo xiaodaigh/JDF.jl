@@ -27,8 +27,7 @@ all(skipmissing([all(a2[!,name] .== Array(a[!,name])) for name in names(a2)])) #
 ```
 
 ### Save and load serially
-You can use the `ssavejdf` and `sloadjdf` function to save a `DataFrame` using
-serially, i.e. without using parallel processes.
+You can use the `ssavejdf` and `sloadjdf` function to save a `DataFrame` serially, i.e. without using parallel processes.
 ```julia
 @time metadatas = ssavejdf("c:/data/iris.jdf", a)
 @time metadatas = sloadjdf("c:/data/iris.jdf")
