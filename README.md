@@ -49,7 +49,7 @@ type_compress!(df, compress_float = true)
 `String` compression is _planned_ and will likely employ categorical encoding combined RLE encoding.
 
 ## Benchmarks
-Here are some benchmarks [Fannie Mae Mortgage Data](https://docs.rapids.ai/datasets/mortgage-data). Please note that a reading of zero means that the method has failed to read or write.
+Here are some benchmarks using the [Fannie Mae Mortgage Data](https://docs.rapids.ai/datasets/mortgage-data). Please note that a reading of zero means that the method has failed to read or write.
 
 JDF is a decent performaner on both read and write and can achieve comparable performance to [R's {fst}](https://www.fstpackage.org/), once compiled. The JDF format also results in much smaller file size vs Feather.jl in this particular example (probably due to Feather.jl's inefficient storage of `Union{String, Missing}`).
 
