@@ -42,39 +42,38 @@ loadjdf(indir; verbose = false) = begin
 	# get the maximum number of bytes needs to read
 	bytes_needed = maximum(get_bytes.(metadatas.metadatas))
 
+	# rate limit channel
+	c1 = Channel(Threads.nthreads())
+	df_lock = Channel(1)
 
-	results = Any[]
+	results = Vector{Any}(undef, length(metadatas.names))
+
 	i = 1
     for (name, metadata) in zip(metadatas.names, metadatas.metadatas)
-		# println(name)
-		# println(metadata)
-		io = BufferedInputStream(open(joinpath(indir,string(name)), "r"))
-		#el = @elapsed res = column_loader!(read_buffer, metadata.type, io, metadata)
-		#df[!,name] = column_loader!(read_buffer, metadata.type, io, metadata)
-		if VERSION >= v"1.3.0-rc1.0"
-			push!(results, (name = name, io = io, task = @spawn column_loader(metadata.type, io, metadata)))
+		put!(c1, true)
+		results[i] = @spawn begin
+			io = BufferedInputStream(open(joinpath(indir,string(name)), "r"))
+			new_result = column_loader(metadata.type, io, metadata)
+			close(io)
+			(name = name, task = new_result)
 		end
-		# if i == 6
-		# 	return results
-		# end
+		take!(c1)
 		i+=1
-
-		# println("$el | loading $name | Type: $(metadata.type)")
     end
-	# return results
-	# return metadatas
+
+	# run this serially
 	for result in results
 		if verbose
 			println("Extracting $(result.name)")
 		end
-		new_result = fetch(result.task)
-		#println(first(new_result))
+
+		new_result = fetch(result).task
+		colname = fetch(result).name
 		if new_result == nothing
-			df[!, result.name] = Vector{Missing}(missing, metadatas.rows)
+			df[!, colname] = Vector{Missing}(missing, metadatas.rows)
 		else
-			df[!, result.name] = new_result
+			df[!, colname] = new_result
 		end
-		close(result.io)
 	end
  	df
 end
