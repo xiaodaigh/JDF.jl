@@ -56,34 +56,33 @@ savejdf(outdir, df) =begin
         return ssavejdf(outdir, df)
     end
 
-#io  = open(outdir, "w")
     pmetadatas = Any[missing for i = 1:length(names(df))]
-#for (name, b) in zip(names(df), eachcol(df))
+
     if !isdir(outdir)
         mkpath(outdir)
     end
-    ios = BufferedOutputStream.(open.(
-        joinpath.(outdir, string.(names(df))),
-        Ref("w"),
-    ))
 
-    for i = 1:length(names(df))
-    #el = @elapsed push!(metadatas, compress_then_write(Array(b), io))
-#println("Start: "*string(Threads.threadid()))
-        pmetadatas[i] = @spawn compress_then_write(Array(df[!, i]), ios[i])
-#pmetadatas[i] = compress_then_write(Array(df[!,i]), ios[i])
-#println("End: "*string(Threads.threadid()))
-    #println("saving $name took $el. Type: $(eltype(Array(b)))")
+    # use a bounded channel to limit
+    c1 = Channel(Threads.nthreads())
+
+    for (i, n) in enumerate(names(df))
+        put!(c1, true)
+        pmetadatas[i] = @spawn begin
+            io = BufferedOutputStream(open(joinpath(outdir, string(n)) ,"w"))
+            res = compress_then_write(Array(df[!, i]), io)
+            close(io)
+            res
+        end
+        take!(c1)
     end
-#close(io)
+
     metadatas = fetch.(pmetadatas)
-    close.(ios)
 
     fnl_metadata = (
         names = names(df),
         rows = size(df, 1),
         metadatas = metadatas,
-    )#, pmetadatas = pmetadatas)
+    )
 
     serialize(joinpath(outdir, "metadata.jls"), fnl_metadata)
     fnl_metadata
@@ -93,9 +92,8 @@ ssavejdf(outdir, df::DataFrame) = begin
     """
         serially save a DataFrames to the outdir
     """
-#io  = open(outdir, "w")
+
     metadatas = Any[missing for i = 1:length(names(df))]
-#for (name, b) in zip(names(df), eachcol(df))
     if !isdir(outdir)
         mkpath(outdir)
     end
@@ -104,15 +102,14 @@ ssavejdf(outdir, df::DataFrame) = begin
         Ref("w"),
     ))
 
-    for i = 1:length(names(df))
-    #el = @elapsed push!(metadatas, compress_then_write(Array(b), io))
-#println("Start: "*string(Threads.threadid()))
-        metadatas[i] = compress_then_write(Array(df[!, i]), ios[i])
-#pmetadatas[i] = compress_then_write(Array(df[!,i]), ios[i])
-#println("End: "*string(Threads.threadid()))
-    #println("saving $name took $el. Type: $(eltype(Array(b)))")
+    try
+        for i = 1:length(names(df))
+            metadatas[i] = compress_then_write(Array(df[!, i]), ios[i])
+        end
+    finally
+        close.(ios)
     end
-    close.(ios)
+
     fnl_metadata = (
         names = names(df),
         rows = size(df, 1),
