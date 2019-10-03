@@ -63,7 +63,7 @@ savejdf(outdir, df) =begin
     end
 
     # use a bounded channel to limit
-    c1 = Channel(Threads.nthreads())
+    c1 = Channel{Bool}(Threads.nthreads())
 
     for (i, n) in enumerate(names(df))
         put!(c1, true)
@@ -88,27 +88,27 @@ savejdf(outdir, df) =begin
     fnl_metadata
 end
 
+"""
+    serially save a DataFrames to the outdir
+"""
 ssavejdf(outdir, df::DataFrame) = begin
-    """
-        serially save a DataFrames to the outdir
-    """
+    pmetadatas = Any[missing for i = 1:length(names(df))]
 
-    metadatas = Any[missing for i = 1:length(names(df))]
     if !isdir(outdir)
         mkpath(outdir)
     end
-    ios = BufferedOutputStream.(open.(
-        joinpath.(outdir, string.(names(df))),
-        Ref("w"),
-    ))
 
-    try
-        for i = 1:length(names(df))
-            metadatas[i] = compress_then_write(Array(df[!, i]), ios[i])
+    # use a bounded channel to limit
+    for (i, n) in enumerate(names(df))
+        pmetadatas[i] = begin
+            io = BufferedOutputStream(open(joinpath(outdir, string(n)) ,"w"))
+            res = compress_then_write(Array(df[!, i]), io)
+            close(io)
+            res
         end
-    finally
-        close.(ios)
     end
+
+    metadatas = pmetadatas
 
     fnl_metadata = (
         names = names(df),
