@@ -13,6 +13,7 @@ using Serialization: serialize, deserialize
 using StatsBase: rle, inverse_rle, countmap
 
 import Base: size, show, getindex, setindex!, eltype
+
 if VERSION >= v"1.3.0-rc1"
     import Base.Threads: @spawn
 else
@@ -63,7 +64,8 @@ savejdf(outdir, df) =begin
     end
 
     # use a bounded channel to limit
-    c1 = Channel(Threads.nthreads())
+    c1 = Channel{Bool}(Threads.nthreads())
+    atexit(()->close(c1))
 
     for (i, n) in enumerate(names(df))
         put!(c1, true)
@@ -97,17 +99,11 @@ ssavejdf(outdir, df::DataFrame) = begin
     if !isdir(outdir)
         mkpath(outdir)
     end
-    ios = BufferedOutputStream.(open.(
-        joinpath.(outdir, string.(names(df))),
-        Ref("w"),
-    ))
 
-    try
-        for i = 1:length(names(df))
-            metadatas[i] = compress_then_write(Array(df[!, i]), ios[i])
-        end
-    finally
-        close.(ios)
+    for i = 1:length(names(df))
+        io = BufferedOutputStream(open(joinpath(outdir, string(names(df)[i])), "w"))
+        metadatas[i] = compress_then_write(Array(df[!, i]), io)
+        close(io)
     end
 
     fnl_metadata = (
