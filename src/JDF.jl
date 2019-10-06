@@ -90,21 +90,25 @@ savejdf(outdir, df) =begin
     fnl_metadata
 end
 
+"""
+    serially save a DataFrames to the outdir
+"""
 ssavejdf(outdir, df::DataFrame) = begin
-    """
-        serially save a DataFrames to the outdir
-    """
+    pmetadatas = Any[missing for i = 1:length(names(df))]
 
-    metadatas = Any[missing for i = 1:length(names(df))]
     if !isdir(outdir)
         mkpath(outdir)
     end
 
     for i = 1:length(names(df))
-        io = BufferedOutputStream(open(joinpath(outdir, string(names(df)[i])), "w"))
+        io = BufferedOutputStream(open(joinpath(outdir, string(names(df)[i])), "w
+
+        "))
         metadatas[i] = compress_then_write(Array(df[!, i]), io)
         close(io)
     end
+
+    metadatas = pmetadatas
 
     fnl_metadata = (
         names = names(df),
