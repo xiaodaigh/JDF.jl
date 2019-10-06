@@ -83,7 +83,7 @@ savejdf(outdir, df) =begin
     fnl_metadata = (
         names = names(df),
         rows = size(df, 1),
-        metadatas = metadatas,
+        metadatas = metadatas
     )
 
     serialize(joinpath(outdir, "metadata.jls"), fnl_metadata)
@@ -101,19 +101,16 @@ ssavejdf(outdir, df::DataFrame) = begin
     end
 
     for i = 1:length(names(df))
-        io = BufferedOutputStream(open(joinpath(outdir, string(names(df)[i])), "w
-
-        "))
-        metadatas[i] = compress_then_write(Array(df[!, i]), io)
+        io = BufferedOutputStream(open(joinpath(outdir, string(names(df)[i])), "w"))
+        pmetadatas[i] = compress_then_write(Array(df[!, i]), io)
         close(io)
     end
 
-    metadatas = pmetadatas
 
     fnl_metadata = (
         names = names(df),
         rows = size(df, 1),
-        metadatas = metadatas,
+        metadatas = pmetadatas
     )
 
     serialize(joinpath(outdir, "metadata.jls"), fnl_metadata)
