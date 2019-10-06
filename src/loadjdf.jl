@@ -43,8 +43,8 @@ loadjdf(indir; verbose = false) = begin
 	bytes_needed = maximum(get_bytes.(metadatas.metadatas))
 
 	# rate limit channel
-	c1 = Channel(Threads.nthreads())
-	df_lock = Channel(1)
+	c1 = Channel{Bool}(Threads.nthreads())
+	atexit(()->close(c1))
 
 	results = Vector{Any}(undef, length(metadatas.names))
 
