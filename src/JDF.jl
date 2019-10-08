@@ -9,7 +9,8 @@ using BufferedStreams
 #using RLEVectors
 using WeakRefStrings
 using Blosc
-using Serialization: serialize, deserialize
+
+
 using StatsBase: rle, inverse_rle, countmap
 
 import Base: size, show, getindex, setindex!, eltype
@@ -21,7 +22,13 @@ else
         println("parallel version do not work in < Julia 1.3")
     end
 end
-# using RLEVectors
+
+if VERSION >= v"1.1"
+    using Serialization: serialize, deserialize
+else
+    using Compat.Serialization: serialize, deserialize
+end
+
 
 export savejdf, loadjdf, nonmissingtype, gf, iow, ior, compress_then_write
 export column_loader!, gf2, ssavejdf, type_compress!, type_compress, sloadjdf
