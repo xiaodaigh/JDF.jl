@@ -46,7 +46,7 @@ The function looks at `Int*` columns and see if it can be safely "downgraded" to
 type_compress!(df, compress_float = true)
 ```
 
-`String` compression is _planned_ and will likely employ categorical encoding combined RLE encoding.
+`String` compression is _planned_ and will likely employ categorical encoding combined with RLE encoding.
 
 ## Benchmarks
 Here are some benchmarks using the [Fannie Mae Mortgage Data](https://docs.rapids.ai/datasets/mortgage-data). Please note that a reading of zero means that the method has failed to read or write.
