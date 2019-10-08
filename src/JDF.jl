@@ -23,11 +23,11 @@ else
     end
 end
 
-if VERSION >= v"1.1"
-    using Serialization: serialize, deserialize
-else
-    using Compat.Serialization: serialize, deserialize
-end
+# if VERSION >= v"1.1"
+using Serialization: serialize, deserialize
+# else
+#     using Compat.Serialization: serialize, deserialize
+# end
 
 
 export savejdf, loadjdf, nonmissingtype, gf, iow, ior, compress_then_write
