@@ -51,7 +51,7 @@ type_compress!(df, compress_float = true)
 ## Benchmarks
 Here are some benchmarks using the [Fannie Mae Mortgage Data](https://docs.rapids.ai/datasets/mortgage-data). Please note that a reading of zero means that the method has failed to read or write.
 
-JDF is a decent performaner on both read and write and can achieve comparable performance to [R's {fst}](https://www.fstpackage.org/), once compiled. The JDF format also results in much smaller file size vs Feather.jl in this particular example (probably due to Feather.jl's inefficient storage of `Union{String, Missing}`).
+JDF is a decent performer on both read and write and can achieve comparable performance to [R's {fst}](https://www.fstpackage.org/), once compiled. The JDF format also results in much smaller file size vs Feather.jl in this particular example (probably due to Feather.jl's inefficient storage of `Union{String, Missing}`).
 
 ![](benchmarks/results/fannie-mae-read-Performance_2004Q3.txt.png)
 ![](benchmarks/results/fannie-mae-write-Performance_2004Q3.txt.png)
@@ -67,11 +67,12 @@ Further support will be added for `CategoricalVectors` and `RLEVectors` in the f
 ## How does JDF work?
 Although JDF is experimental, there are a few tricks up Julia's sleeve. Firstly, this is a purely Julia solution and there are a lot of ways to do nifty things like compression and encapsulating the underlying struture of the arrays that's hard to do in R and Python. E.g. Python's numpy arrays are C objects, but all the vector types used in JDF are Julia data types.
 
-When saving a JDF, each vector is Blosc compressed (using the default settings) if possible; this includes all `T` and `Unions{Missing, T}` types where `T` is `isbits`. For `String` vectors, they are first converted to Run Length Encoding (RLE), and the lengths component in the RLE are `Blosc` compressed.
+When saving a JDF, each vector is Blosc compressed (using the default settings) if possible; this includes all `T` and `Unions{Missing, T}` types where `T` is `isbits`. For `String` vectors, they are first converted to a  Run Length Encoding (RLE) representation, and the lengths component in the RLE are `Blosc` compressed.
 
 ## Development Plans
 I will prioritize bugs fixes but once I consider the format stable I will freeze development unless a bug is reported. So new features will be slow to come onboard. This is because I have other OSS commitments including [R's {disk.frame}](http:/diskframe.com).
 
 ## Notes
-Julia 1.1 is not supported.
-Parallel read and write support is only available from Julia 1.3.
+
+* Julia 1.0 is not supported as the `serialize` function is only available from 1.1.
+* Parallel read and write support is only available from Julia 1.3.
