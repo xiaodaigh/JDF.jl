@@ -1,11 +1,11 @@
 # load the data from file with a schema
-sloadjdf(indir; verbose = false) = begin
+sloadjdf_v1(indir; verbose = false) = begin
 	metadatas = deserialize(joinpath(indir,"metadata.jls"))
 
     df = DataFrame()
 
 	# get the maximum number of bytes needs to read
-	# bytes_needed = maximum(get_bytes.(metadatas.metadatas))
+	bytes_needed = maximum(get_bytes.(metadatas.metadatas))
 
 	# rate limit channel
 	results = Vector{Any}(undef, length(metadatas.names))
@@ -38,7 +38,7 @@ sloadjdf(indir; verbose = false) = begin
  	df
 end
 
-loadjdf(indir; verbose = false) = begin
+loadjdf_v1(indir; verbose = false) = begin
 	if VERSION < v"1.3.0-rc1.0"
 		return sloadjdf(indir, verbose = verbose)
 	end
@@ -48,12 +48,11 @@ loadjdf(indir; verbose = false) = begin
 	end
 
 	metadatas = deserialize(joinpath(indir,"metadata.jls"))
-	#return metadatas
 
     df = DataFrame()
 
 	# get the maximum number of bytes needs to read
-	# bytes_needed = maximum(get_bytes.(metadatas.metadatas))
+	bytes_needed = maximum(get_bytes.(metadatas.metadatas))
 
 	# rate limit channel
 	c1 = Channel{Bool}(Threads.nthreads())
