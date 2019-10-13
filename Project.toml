@@ -1,11 +1,13 @@
 name = "JDF"
 uuid = "babc3d20-cd49-4f60-a736-a8f9c08892d3"
 authors = ["Dai ZJ <zhuojia.dai@gmail.com>"]
-version = "0.1.4-DEV"
+version = "0.2.0-DEV"
 
 [deps]
 Blosc = "a74b3585-a348-5f62-a45c-50e91977d574"
 BufferedStreams = "e1450e63-4bb3-523b-b2a4-4ffa8c0fd77d"
+CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
+CategoricalArrays = "324d7699-5711-5eae-9e2f-1d82baa6b597"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 Missings = "e1d29d7a-bbdc-5cf2-9ac0-f12de2c33e28"
 Serialization = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
@@ -13,7 +15,7 @@ StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 WeakRefStrings = "ea10d353-3f73-51f8-a26c-33c1cb351aa5"
 
 [compat]
-DataFrames = "^0.19.0"
+DataFrames = "0.19"
 julia = ">= 1.1"
 
 [extras]
