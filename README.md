@@ -31,6 +31,8 @@ You can load only a few columns from the dataset by specifying `cols = [:column1
 ```julia
 a2_selected = loadjdf("c:/data/iris.jdf", cols = [:species, :sepalLength, :petalWidth])
 ```
+The difference with loading the whole datasets and then subsetting the columns
+is that it saves time as only the selected columns are loaded from disk.
 
 ### Save and load serially
 You can use the `ssavejdf` and `sloadjdf` function to save a `DataFrame` serially, i.e. without using parallel processes.
