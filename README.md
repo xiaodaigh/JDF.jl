@@ -1,9 +1,9 @@
 # JDF
-An experimental DataFrames serialization format with the following goals
+An experimental `DataFrame`s serialization format with the following goals
 * Fast save and load times
 * Compressed storage on disk
 
-JDF stores a dataframe in a folder with each column stored as a separate file. There is also a `metadata.jls` file that stores metadata about the original dataframe. Collectively, the column files, the metadata file, and the folder is called a JDF "file".
+JDF stores a `DataFrame` in a folder with each column stored as a separate file. There is also a `metadata.jls` file that stores metadata about the original `DataFrame`. Collectively, the column files, the metadata file, and the folder is called a JDF "file".
 
 ## Example: Quick Start
 
@@ -14,7 +14,7 @@ a = dataset("iris") |> DataFrame
 ```
 
 ### *Saving* and *Loading* data
-By default JDF loads and saves `DataFrame`s using parallel processes starting from Julia 1.3. For Julia < 1.3, it saves and loads using one thread only.
+By default JDF loads and saves `DataFrame`s using multiple threads starting from Julia 1.3. For Julia < 1.3, it saves and loads using one thread only.
 ```julia
 @time metadatas = savejdf("c:/data/iris.jdf", a)
 @time a2 = loadjdf("c:/data/iris.jdf")
@@ -24,6 +24,12 @@ Simple checks for correctness
 ```julia
 all(names(a2) .== names(a)) # true
 all(skipmissing([all(a2[!,name] .== Array(a[!,name])) for name in names(a2)])) #true
+```
+
+### Loading only certain columns
+You can load only a few columns from the dataset by specifying `cols = [:column1, :column2]`. For example
+```julia
+a2_selected = loadjdf("c:/data/iris.jdf", cols = [:species, :sepalLength, :petalWidth])
 ```
 
 ### Save and load serially

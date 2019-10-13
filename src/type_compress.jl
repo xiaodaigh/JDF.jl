@@ -1,16 +1,18 @@
+# TODO allow int to uint
 type_compress!(df::DataFrame; compress_float = false, verbose = false) = begin
 	for n in names(df)
 		if verbose
 			println("Compressing $n")
 		end
-		vec = Array(df[!,n])
+		#vec = Vector(df[!,n])
 		if (eltype(vec) != Float64) || compress_float
 			df[!,n] = type_compress(vec)
+		else
+			df[!,n] = type_compress(df[!,n])
 		end
 	end
 	df
 end
-
 
 type_compress(v::Vector{T}) where T <: Union{Int128, Int64, Int32, Int16} = begin
 	min1, max1 = extrema(v)
@@ -76,6 +78,8 @@ type_compress(v::Vector{String}) = begin
 	# TODO recommend a PooledString if necessary
 	# use some heuristic to decide whether to compress
 
+	## if the number of unique elements is predicted to be less than typemax(UInt16) + 1
+	## then we can use categorical array to compress them
 	sv = countmap(sample(v, 888))
 
 	# Estimate the number of unique items
@@ -84,15 +88,12 @@ type_compress(v::Vector{String}) = begin
 	u = length(sv)
 	# if the estimated number of estimtes is less than about 32000 then it's
 	# worth putting it into a categorical array
-	if u + u1/888 * (length(v) - 888) < typemax(UInt16)+1
+	if u + u1/888 * (length(v) - 888) < typemax(UInt16) + 1
 		return categorical(v)
 		# rlev = rle(categorical(v))
 		# rlev[2] .= cumsum(rlev[2])
 		# return RLEVector(rlev...)
 	end
-
-
-
 
 	# check if the string is more compact at RLE level
 	rlev = rle(v)
@@ -158,6 +159,9 @@ type_compress(v::Vector{String}) = begin
 end
 
 type_compress(v::Vector{Missing}) = v
+
+type_compress(v::CategoricalVector) where {T, IntType}  = compress(v)
+
 type_compress(v) = begin
 	# println("The compression for $(typeof(v)) is not yet supported. No compression is performed. Submit an idea if you think JDF should support it: https://github.com/xiaodaigh/JDF.jl/issues")
 	v
