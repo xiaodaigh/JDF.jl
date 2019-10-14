@@ -1,5 +1,5 @@
 """
-
+Saving a String
 """
 compress_then_write(::Type{String}, b::Array{String}, io) = begin
     # write the string one by one

@@ -1,9 +1,8 @@
 compress_then_write(_, b::StringVector{T}, io) where {T} = compress_then_write(b, io)
 
 compress_then_write(b::StringVector{T}, io) where {T} = begin
-    fields = (getfield(b, n) for n in fieldnames(typeof(b)))
     (
-     metadata = [(eltype(f), write(io, Blosc.compress(f))) for f in fields],
+     metadata = [(eltype(getfield(b, n)), write(io, Blosc.compress(getfield(b, n)))) for n in fieldnames(typeof(b))],
      type = typeof(b),
     )
 end
@@ -26,7 +25,7 @@ if false
 using Revise
 using WeakRefStrings, Blosc, JDF, DataFrames
 
-a = StringVector(["a", "b", "a", "c"])
+a = StringVector(["a", "b", "a", missing, "c"])
 io = open("c:/data/test.io", "w")
 metadata = compress_then_write(a, io)
 close(io)
