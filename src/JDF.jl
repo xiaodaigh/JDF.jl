@@ -4,14 +4,11 @@ module JDF
 using Blosc: Blosc
 using DataFrames
 using Missings: Missings
-using StatsBase: rle, inverse_rle, sample
 using BufferedStreams
 #using RLEVectors
 using WeakRefStrings
-using Blosc
 
-
-using StatsBase: rle, inverse_rle, countmap
+using StatsBase: rle, inverse_rle, countmap, sample
 
 import Base: size, show, getindex, setindex!, eltype
 
@@ -29,7 +26,6 @@ using Serialization: serialize, deserialize
 #     using Compat.Serialization: serialize, deserialize
 # end
 
-
 export savejdf, loadjdf, nonmissingtype, gf, iow, ior, compress_then_write
 export column_loader!, gf2, ssavejdf, type_compress!, type_compress, sloadjdf
 export column_loader
@@ -46,7 +42,6 @@ include("compress_then_write.jl")
 include("loadjdf.jl")
 include("savejdf.jl")
 include("type_compress.jl")
-
 
 # Blosc.set_num_threads(6)
 
