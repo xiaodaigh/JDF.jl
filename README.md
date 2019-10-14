@@ -88,11 +88,15 @@ of Julia where multi-threading isn't available, JDF is roughly 2x slower than as
 shown in the benchmarks.
 
 ## Supported data types
-I believe that restricting the types that JDF supports is vital for simplicity.
+I believe that restricting the types that JDF supports is vital for simplicity and maintainability.
 
-There is support for `String`, `Bool`, and `isbits` types i.e. `UInt*`, `Int*`,
-and `Float*` `Date*` types etc. There is also support for
-`CategoricalVectors{T}` if `T` is also a supported type.
+There is support for
+* `WeakRefStrings.StringVector`
+* `Vector{T}`
+* `CategoricalArrays.CategoricalVetors{T}`
+
+where `T` can be `String`, `Bool`, and `isbits` types i.e. `UInt*`, `Int*`,
+and `Float*` `Date*` types etc.
 
 `RLEVectors` support will be considered in the future when `missing` support
 arrives for `RLEVectors.jl`.

@@ -34,9 +34,15 @@ export savejdf, loadjdf, nonmissingtype, gf, iow, ior, compress_then_write
 export column_loader!, gf2, ssavejdf, type_compress!, type_compress, sloadjdf
 export column_loader
 
-include("categorical-arrays.jl")
+include("type-writer-loader/Bool.jl")
+include("type-writer-loader/categorical-arrays.jl")
+include("type-writer-loader/Missing.jl")
+include("type-writer-loader/String.jl")
+include("type-writer-loader/StringArray.jl")
+
 include("column_loader.jl")
 include("compress_then_write.jl")
+
 include("loadjdf.jl")
 include("savejdf.jl")
 include("type_compress.jl")
