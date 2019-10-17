@@ -4,7 +4,7 @@ type_compress!(df::DataFrame; compress_float = false, verbose = false) = begin
 		if verbose
 			println("Compressing $n")
 		end
-		#vec = Vector(df[!,n])
+		vec = df[!,n]
 		if (eltype(vec) != Float64) || compress_float
 			df[!,n] = type_compress(vec)
 		else
