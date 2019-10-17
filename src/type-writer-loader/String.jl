@@ -1,7 +1,15 @@
 """
 Saving a String
 """
-compress_then_write(::Type{String}, b::Array{String}, io) = begin
+
+#compress_then_write(b::AbstractVector{Union{Missing, String}}, io) = compress_then_write(StringArray(b), io)
+#compress_then_write(b::Vector{Union{Missing, String}}, io) = compress_then_write(StringArray(b), io)
+#compress_then_write(b::Vector{String}, io) = compress_then_write(StringArray(b), io)
+
+compress_then_write(b::Vector{String}, io) = begin
+    # TODO compare whether StringArray is better
+    #return StringArray(b)
+    #return compress_then_write(StringArray(b), io)
     # write the string one by one
     # do a Run-length encoding (RLE)
     previous_b = b[1]
