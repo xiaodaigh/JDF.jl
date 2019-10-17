@@ -1,5 +1,3 @@
-compress_then_write(_, b::StringVector{T}, io) where {T} = compress_then_write(b, io)
-
 compress_then_write(b::StringVector{T}, io) where {T} = begin
     (
      metadata = [(eltype(getfield(b, n)), write(io, Blosc.compress(getfield(b, n)))) for n in fieldnames(typeof(b))],
