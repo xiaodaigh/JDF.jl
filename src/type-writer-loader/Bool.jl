@@ -12,7 +12,7 @@ column_loader!(buffer, T::Type{Bool}, io, metadata) = begin
     Bool.(res)
 end
 
-compress_then_write(::Type{Bool}, b, io) = begin
+compress_then_write(b::Vector{Bool}, io) = begin
     b8 = UInt8.(b)
     bbc = Blosc.compress(b8)
     write(io, bbc)
