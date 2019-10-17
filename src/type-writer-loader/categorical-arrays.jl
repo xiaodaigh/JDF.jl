@@ -1,8 +1,3 @@
-# # compress_then_write-cate.jl
-# using Revise
-# using JDF
-# using DataFrames, Debugger
-
 compress_then_write(b::CategoricalVector{T, IntType}, io) where {T, IntType <: Integer} = begin
     compress_refs = compress_then_write(b.refs, io)
     compress_poolindex = compress_then_write(b.pool.index, io)
@@ -19,6 +14,10 @@ column_loader(b::Type{CategoricalVector}, io, metadata) = begin
 end
 
 if false
+# # compress_then_write-cate.jl
+# using Revise
+# using JDF
+# using DataFrames, Debugger
 a = categorical(["a", "b", "a", "c"])
 io = open("c:/data/test.io", "w")
 metadata = compress_then_write(a, io)
