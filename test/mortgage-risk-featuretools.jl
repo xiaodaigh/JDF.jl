@@ -12,6 +12,8 @@ a[!, :cate] = categorical(a[!, :stringarr])
 a = nothing
 @time a = loadjdf("c:/data/feature_matrix_cleaned.csv.jdf")
 
+type_compress!(a, compress_float=true)
+@time savejdf("c:/data/feature_matrix_cleaned.csv.compressed.jdf", a)
 
-
-a[!, names(a)[2]]
+using BenchmarkTools
+@benchmark a = loadjdf("c:/data/feature_matrix_cleaned.csv.jdf")
