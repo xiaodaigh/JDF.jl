@@ -2,7 +2,8 @@ using JDF
 using Test
 using DataFrames
 
-# include("test-categorical-ararys.jl")
+ include("test-categorical-ararys.jl")
+ include("test-stringarray.jl")
 
 @testset "JDF.jl parallel" begin
     df = DataFrame([collect(1:100) for i =1:3000])
@@ -23,25 +24,4 @@ end
     @test size(sloadjdf("a2.jdf"), 1) == 100
 
     rm("a2.jdf", force=true, recursive=true)
-end
-
-@testset "JDF.jl categorical" begin
-df = DataFrame([collect(1:100) for i =1:3])
-df[!, :x1] = categorical(df[!, :x1])
-df[!, :x2] = categorical(string.(df[!, :x2]))
-ssavejdf("a2cate.jdf", df)
-
-# io = open("c:/data/io.io", "w")
-# meta = compress_then_write(df[!, :x2], io)
-# close(io)
-#column_loader(CategoricalVector, io, meta)
-
-df2 = sloadjdf("a2cate.jdf", verbose=true)
-
-@test size(df2, 2) == 3
-@test size(df2, 1) == 100
-@time df2[!, :x1] isa CategoricalVector{Int}
-@time df2[!, :x2] isa CategoricalVector{String}
-
-rm("a2cate.jdf", force=true, recursive=true)
 end

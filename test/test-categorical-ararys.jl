@@ -8,8 +8,8 @@ using JDF
     df[!, :x2] = categorical(string.(df[!, :x2]))
     savejdf("a3cate.jdf", df)
 
-    df2 = loadjdf("a2cate.jdf", cols=[:x2, :x3])
-    @test size(df2, 2) == 3
+    df2 = loadjdf("a3cate.jdf", cols=[:x2, :x1])
+    @test size(df2, 2) == 2
     @test size(df2, 1) == 100
     @time df2[!, :x1] isa CategoricalVector{Int}
     @time df2[!, :x2] isa CategoricalVector{String}
