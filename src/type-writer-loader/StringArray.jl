@@ -1,40 +1,21 @@
 compress_then_write(b::StringVector{T}, io) where {T} = begin
+
+    buffer_meta  = (type=eltype(b.buffer) ,  len=write(io, Blosc.compress(b.buffer)))
+    offsets_meta = (type=eltype(b.offsets),  len=write(io, Blosc.compress(b.offsets)))
+    lengths_meta = (type=eltype(b.lengths),  len=write(io, Blosc.compress(b.lengths)))
+
     (
-     metadata = [(eltype(getfield(b, n)), write(io, Blosc.compress(getfield(b, n)))) for n in fieldnames(typeof(b))],
-     type = typeof(b),
+        metadata = (buffer = buffer_meta, offsets = offsets_meta, lengths = lengths_meta),
+        type = typeof(b),
     )
 end
 
 column_loader(::Type{StringVector{T}}, io, metadata) where {T} = begin
-    # uncompress
-    args = Vector[]
+    buffer  = column_loader(metadata.metadata.buffer.type , io, metadata.metadata.buffer)
+    offsets = column_loader(metadata.metadata.offsets.type, io, metadata.metadata.offsets)
+    lengths = column_loader(metadata.metadata.lengths.type, io, metadata.metadata.lengths)
 
-    # assign the buffer once
-    buffer = Vector{UInt8}(undef, maximum(x -> x[2], metadata.metadata))
-
-    for (elm_type, compressed_bytes) in metadata.metadata
-        readbytes!(io, buffer, compressed_bytes)
-        push!(args, Blosc.decompress(elm_type, buffer))
-    end
-    metadata.type(args...)
+    metadata.type(buffer, offsets, lengths)
 end
 
-if false
-using Revise
-using WeakRefStrings, Blosc, JDF, DataFrames
-
-a = StringVector(["a", "b", "a", missing, "c"])
-io = open("c:/data/test.io", "w")
-metadata = compress_then_write(a, io)
-close(io)
-
-io = open("c:/data/test.io", "r")
-aa = column_loader(StringVector{String}, io, metadata)
-close(io)
-
-df = DataFrame(a = a)
-
-savejdf("c:/data/pls_del.jdf", df)
-
-loadjdf("c:/data/pls_del.jdf")
-end
+# tests at test/test-stringarray.jl

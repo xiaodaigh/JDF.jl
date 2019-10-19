@@ -1,3 +1,5 @@
+# TODO compress Union{Int, Missing} is no missing present
+
 # TODO allow int to uint
 type_compress!(df::DataFrame; compress_float = false, verbose = false) = begin
 	for n in names(df)

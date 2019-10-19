@@ -8,8 +8,9 @@ Saving a String
 
 compress_then_write(b::Vector{String}, io) = begin
     # TODO compare whether StringArray is better
-    #return StringArray(b)
-    #return compress_then_write(StringArray(b), io)
+    # return compress_then_write(StringArray(b), io)
+
+
     # write the string one by one
     # do a Run-length encoding (RLE)
     previous_b = b[1]

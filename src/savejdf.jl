@@ -56,7 +56,7 @@ ssavejdf(outdir, df::DataFrame) = begin
 
     for i = 1:length(names(df))
         io = BufferedOutputStream(open(joinpath(outdir, string(names(df)[i])), "w"))
-        pmetadatas[i] = compress_then_write(Array(df[!, i]), io)
+        pmetadatas[i] = compress_then_write(df[!, i], io)
         close(io)
     end
 
