@@ -23,9 +23,12 @@ sloadjdf(indir; cols = Symbol[], verbose = false) = begin
 	i = 1
     for (name, metadata) in zip(metadatas.names, metadatas.metadatas)
 		if name in cols
+			if verbose
+				println("Loading $name")
+			end
 			results[i] = begin
 				io = BufferedInputStream(open(joinpath(indir,string(name)), "r"))
-				new_result = column_loader(metadata.type, io, metadata)
+				new_result = column_loader(metadata.type, io, metadata)			
 				close(io)
 				(name = name, task = new_result)
 			end
@@ -37,6 +40,7 @@ sloadjdf(indir; cols = Symbol[], verbose = false) = begin
 	for result in results
 		if verbose
 			println("Extracting $(result.name)")
+			println(result.task)
 		end
 
 		new_result = result.task
