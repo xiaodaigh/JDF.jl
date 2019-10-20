@@ -3,8 +3,8 @@ using Test
 using DataFrames
 using Random:randstring
 
- include("test-categorical-ararys.jl")
- include("test-stringarray.jl")
+include("test-categorical-ararys.jl")
+include("test-stringarray.jl")
 
 @testset "JDF.jl parallel" begin
     df = DataFrame([collect(1:100) for i =1:3000])
