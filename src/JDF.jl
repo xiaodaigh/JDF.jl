@@ -10,25 +10,37 @@ using WeakRefStrings
 
 using StatsBase: rle, inverse_rle, countmap, sample
 
-import Base: size, show, getindex, setindex!, eltype
+import Base: show, getindex, setindex!, eltype, names
+
+using Base:size#, @v_str, >=, include, VERSION
+
+using Serialization: serialize, deserialize
+
+import DataFrames: nrow, ncol
 
 if VERSION >= v"1.3.0-rc1"
     import Base.Threads: @spawn
 else
-    macro spawn(x)
+    macro spawn(_)
         println("JDF: parallel save/load do not work in < Julia 1.3")
     end
 end
 
-# if VERSION >= v"1.1"
-using Serialization: serialize, deserialize
-# else
-#     using Compat.Serialization: serialize, deserialize
-# end
+"Define a JDF file"
+struct JDFFile{T <: AbstractString}
+    path::T
+end
 
-export savejdf, loadjdf, nonmissingtype, gf, iow, ior, compress_then_write
-export column_loader!, gf2, ssavejdf, type_compress!, type_compress, sloadjdf
-export column_loader
+"Define a JDF file"
+macro jdf_str(path)
+    return :(JDFFile($path))
+end
+
+export savejdf, loadjdf, ssavejdf, sloadjdf
+export column_loader, column_loader!
+export type_compress!, type_compress
+export compress_then_write
+export JDFFile, @jdf_str, jdfmetadata, metadata, nrow, ncol, size, names
 
 include("type-writer-loader/Bool.jl")
 include("type-writer-loader/categorical-arrays.jl")
@@ -43,6 +55,10 @@ include("loadjdf.jl")
 include("savejdf.jl")
 include("type_compress.jl")
 
+include("metadata.jl")
+
 # Blosc.set_num_threads(6)
+
+
 
 end # module
