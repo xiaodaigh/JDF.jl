@@ -3,14 +3,32 @@ some_elm(::Type{Missing}) = missing
 some_elm(::Type{String}) = ""
 
 """
-    save a DataFrames to the outdir
+    savejdf(outdir, dataframe)
+
+    savejdf(dataframe, outdir)
+
+Save a `DataFrame` to the `outdir`. On Julia > v1.3, a multithreaded version is
+used.
+
+The columns of the dataframe can be of the following vector types columns are
+supported
+
+    * `isbits` types e.g. `Int*`, `UInt*`, `Float*`
+    * `Bool`
+    * `Strings`
+    * `WeakRefStrings.StringVector`
+    * `CategoricalArrays`
+    * `Union{Missing, T}`` for `T` support above
+
 """
-savejdf(outdir, df) =begin
+savejdf(df::AbstractDataFrame, outdir::AbstractString) = savejdf(outdir, df)
+
+savejdf(outdir, df::AbstractDataFrame) = begin
     if VERSION < v"1.3.0-rc1"
         return ssavejdf(outdir, df)
     end
 
-    pmetadatas = Any[missing for i = 1:length(names(df))]
+    pmetadatas = Any[missing for i = 1:length(DataFrames.names(df))]
 
     if !isdir(outdir)
         mkpath(outdir)
@@ -20,7 +38,7 @@ savejdf(outdir, df) =begin
     c1 = Channel{Bool}(Threads.nthreads())
     atexit(()->close(c1))
 
-    for (i, n) in enumerate(names(df))
+    for (i, n) in enumerate(DataFrames.names(df))
         put!(c1, true)
         pmetadatas[i] = @spawn begin
             io = BufferedOutputStream(open(joinpath(outdir, string(n)) ,"w"))
@@ -34,8 +52,8 @@ savejdf(outdir, df) =begin
     metadatas = fetch.(pmetadatas)
 
     fnl_metadata = (
-        names = names(df),
-        rows = size(df, 1),
+        names = DataFrames.names(df),
+        rows = DataFrames.size(df, 1),
         metadatas = metadatas,
         version = v"0.2"
     )
@@ -48,22 +66,22 @@ end
     serially save a DataFrames to the outdir
 """
 ssavejdf(outdir, df::DataFrame) = begin
-    pmetadatas = Any[missing for i = 1:length(names(df))]
+    pmetadatas = Any[missing for i = 1:length(DataFrames.names(df))]
 
     if !isdir(outdir)
         mkpath(outdir)
     end
 
-    for i = 1:length(names(df))
-        io = BufferedOutputStream(open(joinpath(outdir, string(names(df)[i])), "w"))
+    for i = 1:length(DataFrames.names(df))
+        io = BufferedOutputStream(open(joinpath(outdir, string(DataFrames.names(df)[i])), "w"))
         pmetadatas[i] = compress_then_write(df[!, i], io)
         close(io)
     end
 
 
     fnl_metadata = (
-        names = names(df),
-        rows = size(df, 1),
+        names = DataFrames.names(df),
+        rows = DataFrames.size(df, 1),
         metadatas = pmetadatas,
         version = v"0.2"
     )
