@@ -40,6 +40,43 @@ a2_selected = loadjdf("c:/data/iris.jdf", cols = [:species, :sepalLength, :petal
 The difference with loading the whole datasets and then subsetting the columns
 is that it saves time as only the selected columns are loaded from disk.
 
+### Metadata Names & Size from disk
+You can create a variable of type `JDFFile` that allows you to access some
+metadata about the JDF on disk.
+
+```julia
+jdf"path/to/JDF.jdf"
+```
+or
+```julia
+JDFFile(path_to_JDF)
+```
+You can obtain the column names and size (`nrow` and `ncol`) of a JDF, for
+example:
+
+
+```julia
+using JDF, DataFrames
+df = DataFrame(a = 1:3, b = 1:3)
+savejdf(df, "plsdel.jdf")
+
+
+names(jdf"plsdel.jdf") # [:a, :b]
+
+nrow(jdf"plsdel.jdf") # 3
+
+ncol(jdf"plsdel.jdf") # 2
+
+size(jdf"plsdel.jdf") # (2, 3)
+
+size(jdf"plsdel.jdf", 1) # (2, 3)
+
+size(jdf"plsdel.jdf", 1) # (2, 3)
+
+# clean up
+rm("plsdel.jdf", force = true, recursive = true)
+```
+
 ### Save and load serially
 You can use the `ssavejdf` and `sloadjdf` function to save a `DataFrame`
 serially, i.e. without using parallel processes.
@@ -124,3 +161,4 @@ onboard. This is because I have other OSS commitments including [R's
 
 * Julia 1.0 is not supported as the `serialize` function is only available from 1.1.
 * Parallel read and write support is only available from Julia 1.3.
+* The design of JDF was inspired by [fst](fstpackage.org) in terms of using compressions and allowing random-access to columns
