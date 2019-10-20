@@ -16,7 +16,7 @@ if VERSION >= v"1.3.0-rc1"
     import Base.Threads: @spawn
 else
     macro spawn(x)
-        println("parallel version do not work in < Julia 1.3")
+        println("JDF: parallel save/load do not work in < Julia 1.3")
     end
 end
 
