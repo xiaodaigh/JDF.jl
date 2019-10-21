@@ -26,21 +26,67 @@ else
     end
 end
 
-"Define a JDF file"
-struct JDFFile{T <: AbstractString}
-    path::T
-end
-
-"Define a JDF file"
-macro jdf_str(path)
-    return :(JDFFile($path))
-end
-
 export savejdf, loadjdf, ssavejdf, sloadjdf
 export column_loader, column_loader!
 export type_compress!, type_compress
 export compress_then_write
 export JDFFile, @jdf_str, jdfmetadata, metadata, nrow, ncol, size, names
+
+"""
+    jdf"path/to/JDFfile.jdf"
+
+    JDFFile("path/to/JDFfile.jdf")
+
+Define a JDF file, which you can apply `nrow`, `ncol`, `names` and `size`.
+
+## Example
+using JDF, DataFrames
+df = DataFrame(a = 1:3, b = 1:3)
+savejdf(df, "plsdel.jdf")
+
+names(jdf"plsdel.jdf") # [:a, :b]
+nrow(jdf"plsdel.jdf") # 3
+ncol(jdf"plsdel.jdf") # 2
+size(jdf"plsdel.jdf") # (2, 3)
+
+size(jdf"plsdel.jdf", 1) # (2, 3)
+
+size(jdf"plsdel.jdf", 1) # (2, 3)
+
+# clean up
+rm("plsdel.jdf", force = true, recursive = true)
+"""
+struct JDFFile{T <: AbstractString}
+    path::T
+end
+
+"""
+    jdf"path/to/JDFfile.jdf"
+
+    JDFFile("path/to/JDFfile.jdf")
+
+Define a JDF file, which you can apply `nrow`, `ncol`, `names` and `size`.
+
+## Example
+using JDF, DataFrames
+df = DataFrame(a = 1:3, b = 1:3)
+savejdf(df, "plsdel.jdf")
+
+names(jdf"plsdel.jdf") # [:a, :b]
+nrow(jdf"plsdel.jdf") # 3
+ncol(jdf"plsdel.jdf") # 2
+size(jdf"plsdel.jdf") # (2, 3)
+
+size(jdf"plsdel.jdf", 1) # (2, 3)
+
+size(jdf"plsdel.jdf", 1) # (2, 3)
+
+# clean up
+rm("plsdel.jdf", force = true, recursive = true)
+"""
+macro jdf_str(path)
+    return :(JDFFile($path))
+end
 
 include("type-writer-loader/Bool.jl")
 include("type-writer-loader/categorical-arrays.jl")
