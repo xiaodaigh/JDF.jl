@@ -1,6 +1,20 @@
 # TODO compress Union{Int, Missing} is no missing present
 
 # TODO allow int to uint
+"""
+	type_compress!(df, compress_float = false, verbose = false)
+
+Compress a DataFrame by using types of smaller bit. If safe to do so, it will
+"downgrade" `Int*` and `UInt*` if safe to do some. It will compress any
+`CategoricalVector` with `DataFrames.compress`.
+
+For `Vector{String}`, if the number unique values is less than 2^16 then it will
+be converted to `CategoricalVector` and otherwise will be stored as
+`WeakRefStrings.StringVector`.
+
+If `compress_float = true` then `Float64` will be downgraded to `Float32`; but
+beware that this means the calculation will be done with reduce precision.
+"""
 type_compress!(df::DataFrame; compress_float = false, verbose = false) = begin
 	for n in names(df)
 		if verbose
@@ -79,19 +93,23 @@ type_compress(v::Vector{String}) = begin
 
 	## if the number of unique elements is predicted to be less than typemax(UInt16) + 1
 	## then we can use categorical array to compress them
-	sv = countmap(sample(v, 888))
+	# sv = countmap(sample(v, 888))
+	#
+	# # Estimate the number of unique items
+	# # https://stats.stackexchange.com/questions/19014/how-can-i-estimate-unique-occurrence-counts-from-a-random-sampling-of-data
+	# u1 = length([key for (key, value) in sv if value == 1])
+	# u = length(sv)
+	# # if the estimated number of estimtes is less than about 32000 then it's
+	# # worth putting it into a categorical array
+	# if u + u1/888 * (length(v) - 888) < typemax(UInt16) + 1
+	# 	return categorical(v)
+	# 	# rlev = rle(categorical(v))
+	# 	# rlev[2] .= cumsum(rlev[2])
+	# 	# return RLEVector(rlev...)
+	# end
 
-	# Estimate the number of unique items
-	# https://stats.stackexchange.com/questions/19014/how-can-i-estimate-unique-occurrence-counts-from-a-random-sampling-of-data
-	u1 = length([key for (key, value) in sv if value == 1])
-	u = length(sv)
-	# if the estimated number of estimtes is less than about 32000 then it's
-	# worth putting it into a categorical array
-	if u + u1/888 * (length(v) - 888) < typemax(UInt16) + 1
+	if length(Set(v)) <= 2^16
 		return categorical(v)
-		# rlev = rle(categorical(v))
-		# rlev[2] .= cumsum(rlev[2])
-		# return RLEVector(rlev...)
 	end
 
 	# check if the string is more compact at RLE level

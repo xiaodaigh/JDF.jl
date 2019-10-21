@@ -24,8 +24,8 @@ savejdf(DataFrame(a = 1:3, b = 1:3), "plsdel.jdf")
 JDF.names("plsdel.jdf")
 ```
 """
-# names(indir) = jdfmetadata(indir).names
 names(jdf::JDFFile) = metadata(jdf).names
+# names(indir) = jdfmetadata(indir).names
 
 """
     JDF.nrow(indir)
