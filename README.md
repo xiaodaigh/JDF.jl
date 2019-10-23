@@ -1,6 +1,6 @@
 # JDF
 
-An experimental `DataFrame`s serialization format with the following goals
+A Julia `DataFrame`s serialization format with the following goals
 * Fast save and load times
 * Compressed storage on disk
 
