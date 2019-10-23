@@ -158,13 +158,11 @@ Encoding (RLE) representation, and the lengths component in the RLE are `Blosc`
 compressed.
 
 ## Development Plans
-I will prioritize bugs fixes but once I consider the format stable I will freeze
-development unless a bug is reported. So new features will be slow to come
-onboard. This is because I have other OSS commitments including [R's
-{disk.frame}](http:/diskframe.com).
+I fully intend to develop JDF.jl into a language neutral format by version v0.4. However, I have other OSS commitments including [R's
+{disk.frame}](http:/diskframe.com) and hence new features might be slow to come onboard. But I am fully committed to making JDF files created using JDF.jl v0.2 or higher loadable in all future JDF.jl versions.
 
 ## Notes
 
-* Julia 1.0 is not supported as the `serialize` function is only available from 1.1.
+* Julia 1.0 is not supported as the `serialize` function used by JDF.jl is only available from 1.1.
 * Parallel read and write support is only available from Julia 1.3.
 * The design of JDF was inspired by [fst](fstpackage.org) in terms of using compressions and allowing random-access to columns
