@@ -53,6 +53,10 @@ end
     string content lengths
 """
 column_loader!(_, ::Type{String}, io, metadata) = begin
+    column_loader(String, io, metadata)
+end
+
+column_loader(::Type{String}, io, metadata) = begin
     buffer = Vector{UInt8}(undef, metadata.string_compressed_bytes)
     readbytes!(io, buffer, metadata.string_compressed_bytes)
     #return String(buffer)

@@ -93,6 +93,7 @@ include("type-writer-loader/categorical-arrays.jl")
 include("type-writer-loader/Missing.jl")
 include("type-writer-loader/String.jl")
 include("type-writer-loader/StringArray.jl")
+include("type-writer-loader/Symbol.jl")
 
 include("column_loader.jl")
 include("compress_then_write.jl")
