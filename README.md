@@ -138,7 +138,7 @@ There is support for
 * `Vector{T}`
 * `CategoricalArrays.CategoricalVetors{T}`
 
-where `T` can be `String`, `Bool`, and `isbits` types i.e. `UInt*`, `Int*`,
+where `T` can be `String`, `Bool`, `Symbol`, and `isbits` types i.e. `UInt*`, `Int*`,
 and `Float*` `Date*` types etc.
 
 `RLEVectors` support will be considered in the future when `missing` support
