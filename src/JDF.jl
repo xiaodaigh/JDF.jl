@@ -89,6 +89,7 @@ macro jdf_str(path)
 end
 
 include("type-writer-loader/Bool.jl")
+include("type-writer-loader/Char.jl")
 include("type-writer-loader/categorical-arrays.jl")
 include("type-writer-loader/Missing.jl")
 include("type-writer-loader/String.jl")

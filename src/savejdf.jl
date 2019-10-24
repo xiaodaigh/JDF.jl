@@ -1,6 +1,4 @@
 some_elm(x) = zero(x)
-some_elm(::Type{Missing}) = missing
-some_elm(::Type{String}) = ""
 
 """
     savejdf(outdir, dataframe)
