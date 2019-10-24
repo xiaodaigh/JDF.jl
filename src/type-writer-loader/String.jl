@@ -1,3 +1,5 @@
+some_elm(::Type{String}) = ""
+
 """
 Saving a String
 """
