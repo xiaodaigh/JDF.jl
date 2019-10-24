@@ -6,7 +6,7 @@ using DataFrames
 using Missings: Missings
 using BufferedStreams
 #using RLEVectors
-using WeakRefStrings
+using WeakRefStrings, TimeZones
 
 using StatsBase: rle, inverse_rle, countmap, sample
 
