@@ -75,11 +75,11 @@ nrow(jdf"plsdel.jdf") # 3
 
 ncol(jdf"plsdel.jdf") # 2
 
-size(jdf"plsdel.jdf") # (2, 3)
+size(jdf"plsdel.jdf") # (3, 2)
 
-size(jdf"plsdel.jdf", 1) # (2, 3)
+size(jdf"plsdel.jdf", 1) # 2
 
-size(jdf"plsdel.jdf", 1) # (2, 3)
+size(jdf"plsdel.jdf", 2) # 3
 
 # clean up
 rm("plsdel.jdf", force = true, recursive = true)
