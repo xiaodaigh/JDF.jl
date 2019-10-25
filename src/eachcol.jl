@@ -17,13 +17,3 @@ Base.iterate(jdf::JDFFileColIterator, state = 1) = begin
     res1 = sloadjdf(jdf.jdf, cols=[jdf.cols[state]])[!,1]
     return (res1, state + 1)
 end
-
-if false
-a = jdf"a.jdf"
-
-ea = eachcol(a)
-iea = iterate(ea)
-
-
-
-end
