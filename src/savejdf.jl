@@ -1,4 +1,14 @@
-some_elm(x::Type{T}) where T = T(0)
+some_elm(x::Type{T}) where T = begin
+    try
+        return zero(T)
+    catch
+        try
+            return T(0)
+        catch
+            throw("the type $T is not supported by JDF.jl yet. Try to upgrade JDF.jl. If it still doesn't work after update, please submit an issue at https://github.com/xiaodaigh/JDF.jl/issues")
+        end
+    end
+end
 
 """
     savejdf(outdir, dataframe)
