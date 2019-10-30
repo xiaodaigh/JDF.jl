@@ -1,11 +1,24 @@
-some_elm(x::Type{T}) where T = begin
+"""
+    some_elm(::Type{T})
+
+Some arbitrary element of type `T`
+"""
+some_elm(::Type{T}) where T = begin
     try
         return zero(T)
     catch
         try
             return T(0)
         catch
-            throw("the type $T is not supported by JDF.jl yet. Try to update JDF.jl. If it still doesn't work after update, please submit an issue at https://github.com/xiaodaigh/JDF.jl/issues")
+            try
+                rand(T)
+            catch
+                try
+                    Vector{T}(undef, 1)[1]
+                catch
+                    throw("the type $T is not supported by JDF.jl yet. Try to update JDF.jl. If it still doesn't work after update, please submit an issue at https://github.com/xiaodaigh/JDF.jl/issues")
+                end
+            end
         end
     end
 end
