@@ -1,4 +1,4 @@
-some_elm(x) = zero(x)
+some_elm(x::T) where T = T(0)
 
 """
     savejdf(outdir, dataframe)
