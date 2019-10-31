@@ -15,6 +15,7 @@ import Base: show, getindex, setindex!, eltype, names
 using Base:size#, @v_str, >=, include, VERSION
 
 using Serialization: serialize, deserialize
+using CSV
 
 import DataFrames: nrow, ncol
 

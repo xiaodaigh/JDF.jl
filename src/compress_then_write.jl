@@ -1,4 +1,8 @@
 # the generic dispatch
+compress_then_write(b::CC, io) where CC <: CSV.Column = begin
+    compress_then_write(Vector(b), io)
+end
+
 compress_then_write(b::AbstractVector{T}, io) where T = begin
     #return eltype(b), Vector(b)
     compress_then_write(Vector(b), io)
