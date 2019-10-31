@@ -27,6 +27,10 @@ type_compress!(df::DataFrame; compress_float = false, verbose = false) = begin
 	df
 end
 
+# for CSV.Column read from CSV
+type_compress(v::CC) where CC <: CSV.Column = type_compress(Vector(v))
+
+#
 type_compress(v::Vector{T}) where T <: Union{Int128, Int64, Int32, Int16} = begin
 	min1, max1 = extrema(v)
 

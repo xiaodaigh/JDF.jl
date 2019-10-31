@@ -44,7 +44,7 @@ supported
 """
 savejdf(df::AbstractDataFrame, outdir::AbstractString) = savejdf(outdir, df)
 
-savejdf(outdir, df::AbstractDataFrame) = begin
+savejdf(outdir, df::AbstractDataFrame; verbose = false) = begin
     if VERSION < v"1.3.0-rc1"
         return ssavejdf(outdir, df)
     end
@@ -60,6 +60,9 @@ savejdf(outdir, df::AbstractDataFrame) = begin
     atexit(()->close(c1))
 
     for (i, n) in enumerate(DataFrames.names(df))
+        if verbose
+            println(n)
+        end
         put!(c1, true)
         pmetadatas[i] = @spawn begin
             io = BufferedOutputStream(open(joinpath(outdir, string(n)) ,"w"))
