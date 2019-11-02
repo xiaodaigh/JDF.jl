@@ -32,7 +32,7 @@ export column_loader, column_loader!
 export type_compress!, type_compress
 export compress_then_write
 export JDFFile, @jdf_str, jdfmetadata, metadata, nrow, ncol, size, names
-export IsBitsType, eachcol
+export IsBitsType, eachcol, some_elm
 """
     jdf"path/to/JDFfile.jdf"
 
@@ -93,9 +93,11 @@ include("type-writer-loader/Bool.jl")
 include("type-writer-loader/Char.jl")
 include("type-writer-loader/categorical-arrays.jl")
 include("type-writer-loader/Missing.jl")
+include("type-writer-loader/Nothing.jl")
 include("type-writer-loader/String.jl")
 include("type-writer-loader/StringArray.jl")
 include("type-writer-loader/Symbol.jl")
+include("type-writer-loader/ZonedDateTime.jl")
 
 include("column_loader.jl")
 include("compress_then_write.jl")
