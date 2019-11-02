@@ -111,6 +111,27 @@ type_compress!(df, compress_float = true)
 `String` compression is _planned_ and will likely employ categorical encoding
 combined with RLE encoding.
 
+### Load each column from disk
+You can load each column of a JDF file from disk
+
+```julia
+jdffile = jdf"iris.jdf"
+for col in eachcol(jdffile)  
+  # do something to col
+  # where `col` is the content of one column of iris.jdf
+end
+```
+
+To iterate through the columns names and the `col`
+
+```julia
+jdffile = jdf"iris.jdf"
+for (name, col) in zip(names(jdffile), eachcol(jdffile))
+  # `name::Symbol` is the name of the column
+  #  `col` is the content of one column of iris.jdf
+end
+```
+
 ## Benchmarks
 Here are some benchmarks using the [Fannie Mae Mortgage
 Data](https://docs.rapids.ai/datasets/mortgage-data). Please note that a reading

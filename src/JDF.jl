@@ -32,7 +32,7 @@ export column_loader, column_loader!
 export type_compress!, type_compress
 export compress_then_write
 export JDFFile, @jdf_str, jdfmetadata, metadata, nrow, ncol, size, names
-export IsBitsType
+export IsBitsType, eachcol
 """
     jdf"path/to/JDFfile.jdf"
 
@@ -106,6 +106,7 @@ include("type_compress.jl")
 
 include("metadata.jl")
 include("IsBitsType.jl")
+include("eachcol.jl")
 
 # Blosc.set_num_threads(6)
 
