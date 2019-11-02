@@ -11,6 +11,11 @@ There is also a `metadata.jls` file that stores metadata about the original
 `DataFrame`. Collectively, the column files, the metadata file, and the folder
 is called a JDF "file".
 
+`JDF.jl` is Julia-only solution and there are a lot of ways to do nifty things
+like compression and encapsulating the underlying struture of the arrays that's
+hard to do in R and Python. E.g. Python's numpy arrays are C objects, but all
+the vector types used in JDF are Julia data types.
+
 ## Please note
 
 The next version of JDF which is v0.3 will contain breaking changes. But don't worry I am fully committed to providing an automatic upgrade path for JDF v0.2 users. This means that you can safely use JDF.jl v0.2 to save your data and not have to worry about the impending breaking change breaking all your JDF files.
@@ -168,12 +173,6 @@ and `Float*` `Date*` types etc.
 arrives for `RLEVectors.jl`.
 
 ## How does JDF work?
-Although JDF is experimental, there are a few tricks up Julia's sleeve. Firstly,
-this is a purely Julia solution and there are a lot of ways to do nifty things
-like compression and encapsulating the underlying struture of the arrays that's
-hard to do in R and Python. E.g. Python's numpy arrays are C objects, but all
-the vector types used in JDF are Julia data types.
-
 When saving a JDF, each vector is Blosc compressed (using the default settings)
 if possible; this includes all `T` and `Unions{Missing, T}` types where `T` is
 `isbits`. For `String` vectors, they are first converted to a  Run Length
@@ -189,3 +188,4 @@ I fully intend to develop JDF.jl into a language neutral format by version v0.4.
 * Julia 1.0 is not supported as the `serialize` function used by JDF.jl is only available from 1.1.
 * Parallel read and write support is only available from Julia 1.3.
 * The design of JDF was inspired by [fst](fstpackage.org) in terms of using compressions and allowing random-access to columns
+
