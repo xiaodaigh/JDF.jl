@@ -158,11 +158,11 @@ I believe that restricting the types that JDF supports is vital for simplicity a
 
 There is support for
 * `WeakRefStrings.StringVector`
-* `Vector{T}`
+* `Vector{T}`, `Vector{Union{Mising, T}}`, `Vector{Union{Nothing, T}}`
 * `CategoricalArrays.CategoricalVetors{T}`
 
-where `T` can be `String`, `Bool`, `Symbol`, and `isbits` types i.e. `UInt*`, `Int*`,
-and `Float*` `Date*` types etc. There is experimental support for `TimeZones.ZonedDateTime`
+where `T` can be `String`, `Bool`, `Symbol`, `Char`, `TimeZones.ZonedDateTime` (experimental) and `isbits` types i.e. `UInt*`, `Int*`,
+and `Float*` `Date*` types etc.
 
 `RLEVectors` support will be considered in the future when `missing` support
 arrives for `RLEVectors.jl`.
