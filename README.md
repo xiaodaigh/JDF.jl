@@ -1,8 +1,10 @@
 # JDF
 
-An experimental `DataFrame`s serialization format with the following goals
+A Julia `DataFrame`s serialization format with the following goals
 * Fast save and load times
 * Compressed storage on disk
+* Enable disk-based data manipulation (not yet achieved; from v0.4.0)
+* Supports machine learning workloads, e.g. mini-batch, sampling (not yet achieved; from v0.4.0)
 
 JDF stores a `DataFrame` in a folder with each column stored as a separate file.
 There is also a `metadata.jls` file that stores metadata about the original
@@ -73,11 +75,11 @@ nrow(jdf"plsdel.jdf") # 3
 
 ncol(jdf"plsdel.jdf") # 2
 
-size(jdf"plsdel.jdf") # (2, 3)
+size(jdf"plsdel.jdf") # (3, 2)
 
-size(jdf"plsdel.jdf", 1) # (2, 3)
+size(jdf"plsdel.jdf", 1) # 2
 
-size(jdf"plsdel.jdf", 1) # (2, 3)
+size(jdf"plsdel.jdf", 2) # 3
 
 # clean up
 rm("plsdel.jdf", force = true, recursive = true)
