@@ -1,4 +1,27 @@
-some_elm(x) = zero(x)
+"""
+    some_elm(::Type{T})
+
+Some arbitrary element of type `T`
+"""
+some_elm(::Type{T}) where T = begin
+    try
+        return zero(T)
+    catch
+        try
+            return T(0)
+        catch
+            try
+                rand(T)
+            catch
+                try
+                    Vector{T}(undef, 1)[1]
+                catch
+                    throw("the type $T is not supported by JDF.jl yet. Try to update JDF.jl. If it still doesn't work after update, please submit an issue at https://github.com/xiaodaigh/JDF.jl/issues")
+                end
+            end
+        end
+    end
+end
 
 """
     savejdf(outdir, dataframe)
@@ -21,7 +44,7 @@ supported
 """
 savejdf(df::AbstractDataFrame, outdir::AbstractString) = savejdf(outdir, df)
 
-savejdf(outdir, df::AbstractDataFrame) = begin
+savejdf(outdir, df::AbstractDataFrame; verbose = false) = begin
     if VERSION < v"1.3.0-rc1"
         return ssavejdf(outdir, df)
     end
@@ -37,6 +60,9 @@ savejdf(outdir, df::AbstractDataFrame) = begin
     atexit(()->close(c1))
 
     for (i, n) in enumerate(DataFrames.names(df))
+        if verbose
+            println(n)
+        end
         put!(c1, true)
         pmetadatas[i] = @spawn begin
             io = BufferedOutputStream(open(joinpath(outdir, string(n)) ,"w"))
