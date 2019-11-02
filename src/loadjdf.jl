@@ -1,3 +1,4 @@
+
 """
     loadjdf(indir, verbose = true)
 
@@ -5,9 +6,6 @@
 
 Load a `DataFrame` from JDF saved at `outdir`. On Julia > v1.3, a multithreaded
 version is used.
-
-
-
 """
 loadjdf(indir; cols = Symbol[], verbose = false) = begin
 	if VERSION < v"1.3.0-rc1.0"
@@ -71,8 +69,8 @@ loadjdf(indir; cols = Symbol[], verbose = false) = begin
  	df
 end
 
-loadjdf(jdf::JDFFile; args...) = loadjdf(jdf.path, args...)
-sloadjdf(jdf::JDFFile;  args...) = sloadjdf(jdf.path,  args...)
+loadjdf(jdf::JDFFile; args...) = loadjdf(jdf.path; args...)
+sloadjdf(jdf::JDFFile; args...) = sloadjdf(jdf.path; args...)
 
 # load the data from file with a schema
 sloadjdf(indir; cols = Symbol[], verbose = false) = begin
