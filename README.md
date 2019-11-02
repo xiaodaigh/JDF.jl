@@ -162,7 +162,7 @@ There is support for
 * `CategoricalArrays.CategoricalVetors{T}`
 
 where `T` can be `String`, `Bool`, `Symbol`, and `isbits` types i.e. `UInt*`, `Int*`,
-and `Float*` `Date*` types etc.
+and `Float*` `Date*` types etc. There is experimental support for `TimeZones.ZonedDateTime`
 
 `RLEVectors` support will be considered in the future when `missing` support
 arrives for `RLEVectors.jl`.
