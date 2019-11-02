@@ -1,3 +1,6 @@
+some_elm(::Type{Missing}) = missing
+
+
 # the dispatch for Union{T, Missing}
 # 1. comporess the missing
 # 2. and also load the missing

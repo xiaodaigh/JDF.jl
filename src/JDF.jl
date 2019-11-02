@@ -6,7 +6,7 @@ using DataFrames
 using Missings: Missings
 using BufferedStreams
 #using RLEVectors
-using WeakRefStrings
+using WeakRefStrings, TimeZones
 
 using StatsBase: rle, inverse_rle, countmap, sample
 
@@ -15,6 +15,7 @@ import Base: show, getindex, setindex!, eltype, names
 using Base:size#, @v_str, >=, include, VERSION
 
 using Serialization: serialize, deserialize
+using CSV
 
 import DataFrames: nrow, ncol
 
@@ -31,7 +32,7 @@ export column_loader, column_loader!
 export type_compress!, type_compress
 export compress_then_write
 export JDFFile, @jdf_str, jdfmetadata, metadata, nrow, ncol, size, names
-
+export IsBitsType, eachcol
 """
     jdf"path/to/JDFfile.jdf"
 
@@ -89,6 +90,7 @@ macro jdf_str(path)
 end
 
 include("type-writer-loader/Bool.jl")
+include("type-writer-loader/Char.jl")
 include("type-writer-loader/categorical-arrays.jl")
 include("type-writer-loader/Missing.jl")
 include("type-writer-loader/String.jl")
@@ -103,6 +105,8 @@ include("savejdf.jl")
 include("type_compress.jl")
 
 include("metadata.jl")
+include("IsBitsType.jl")
+include("eachcol.jl")
 
 # Blosc.set_num_threads(6)
 
