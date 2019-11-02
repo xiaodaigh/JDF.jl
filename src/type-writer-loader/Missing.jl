@@ -22,7 +22,7 @@ compress_then_write(b::Vector{Union{T, Missing}}, io) where T = begin
 end
 
 # just write it out as missing
-compress_then_write(b::Vector{Missing}, io) = (len = 0, type = Missing)
+compress_then_write(b::Vector{Missing}, io) = (len = 0, type = Missing, orig_len = length(b))
 
 column_loader!(buffer, ::Type{Union{Missing,T}}, io, metadata) where {T} = begin
     # read the content
@@ -37,4 +37,4 @@ column_loader!(buffer, ::Type{Union{Missing,T}}, io, metadata) where {T} = begin
     t_pre
 end
 
-column_loader!(buffer, ::Type{Missing}, io, metadata) = nothing
+column_loader!(buffer, ::Type{Missing}, io, metadata) = Vector{Missing}(missing, metadata.orig_len)

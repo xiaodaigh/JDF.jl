@@ -9,6 +9,7 @@ include("test-stringarray.jl")
 include("test-symbol.jl")
 include("test-jdf-str.jl")
 include("test-eachcol.jl")
+include("test-ZonedDateTime.jl")
 
 @testset "JDF.jl parallel" begin
     df = DataFrame([collect(1:100) for i =1:3000])
