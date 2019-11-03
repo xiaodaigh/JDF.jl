@@ -27,6 +27,7 @@ else
     end
 end
 
+
 function __init__()
     if VERSION >= v"1.3.0-rc1"
         Blosc.set_num_threads(Threads.nthreads())
@@ -115,7 +116,6 @@ include("savejdf.jl")
 include("type_compress.jl")
 
 include("metadata.jl")
-include("IsBitsType.jl")
 include("eachcol.jl")
 
 # Blosc.set_num_threads(6)

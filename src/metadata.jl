@@ -3,7 +3,11 @@
 
 Load the metadata associated with the JDF in `indir`
 """
-jdfmetadata(indir) = deserialize(joinpath(indir,"metadata.jls"))
+jdfmetadata(indir) = begin
+    open(joinpath(indir,"metadata.jls")) do io
+        deserialize(io)
+    end
+end
 
 """
     JDF.metadata(indir)
