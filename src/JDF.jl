@@ -27,6 +27,14 @@ else
     end
 end
 
+function __init__()
+    if VERSION >= v"1.3.0-rc1"
+        Blosc.set_num_threads(Threads.nthreads())
+    else
+        Blosc.set_num_threads(isdefined(Sys, :CPU_CORES) ? Sys.CPU_CORES : Sys.CPU_THREADS)
+    end
+end
+
 export savejdf, loadjdf, ssavejdf, sloadjdf
 export column_loader, column_loader!
 export type_compress!, type_compress
