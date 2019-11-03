@@ -115,7 +115,6 @@ include("savejdf.jl")
 include("type_compress.jl")
 
 include("metadata.jl")
-include("IsBitsType.jl")
 include("eachcol.jl")
 
 # Blosc.set_num_threads(6)
