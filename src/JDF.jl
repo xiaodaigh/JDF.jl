@@ -27,9 +27,6 @@ else
     end
 end
 
-if VERSION < v"1.1"
-    using Compat:eachcol
-end
 
 function __init__()
     if VERSION >= v"1.3.0-rc1"
