@@ -16,10 +16,10 @@ loadjdf(indir; cols = Symbol[], verbose = false) = begin
 		println("loading $indir in parallel")
 	end
 
-	open(joinpath(indir,"metadata.jls")) do io
-		metadatas = deserialize(io)
+	metadatas = open(joinpath(indir,"metadata.jls")) do io
+		 deserialize(io)
 	end
-	
+
 	if length(cols) == 0
 		cols = metadatas.names
 	else
@@ -77,8 +77,8 @@ sloadjdf(jdf::JDFFile; args...) = sloadjdf(jdf.path; args...)
 
 # load the data from file with a schema
 sloadjdf(indir; cols = Symbol[], verbose = false) = begin
-	open(joinpath(indir,"metadata.jls")) do io
-		metadatas = deserialize(io)
+	metadatas = open(joinpath(indir,"metadata.jls")) do io
+		deserialize(io)
 	end
 
 	if length(cols) == 0
