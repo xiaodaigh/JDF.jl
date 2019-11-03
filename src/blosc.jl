@@ -22,7 +22,7 @@ Decompress
 """
 blosc_decompress(t::Type{T}, io, metadata) where {T} = begin
     buffer = Vector{UInt8}(undef, metadata.len)
-    column_loader!(buffer, t, io, metadata)
+    blosc_decompress!(buffer, t, io, metadata)
 end
 
 # load bytes bytes from io decompress into type
