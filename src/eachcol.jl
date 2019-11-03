@@ -1,4 +1,10 @@
-import Base: iterate, eachcol, length
+if VERSION < v"1.1"
+    import Compat:eachcol
+else
+    import Base:eachcol
+end
+
+import Base: iterate, length
 
 struct JDFFileColIterator
     jdf::JDFFile
