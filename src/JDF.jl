@@ -27,6 +27,7 @@ else
     end
 end
 
+
 function __init__()
     if VERSION >= v"1.3.0-rc1"
         Blosc.set_num_threads(Threads.nthreads())

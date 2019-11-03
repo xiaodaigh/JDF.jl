@@ -1,11 +1,17 @@
-import Base: iterate, eachcol, length
+# if VERSION < v"1.1"
+#     import Compat:eachcol
+# else
+    import DataFrames:eachcol
+# end
+
+import Base: iterate, length
 
 struct JDFFileColIterator
     jdf::JDFFile
     cols::Vector{Symbol}
 end
 
-Base.eachcol(jdf::JDFFile) = JDFFileColIterator(jdf, names(jdf))
+eachcol(jdf::JDFFile) = JDFFileColIterator(jdf, names(jdf))
 
 Base.length(jdf::JDFFileColIterator) = length(jdf.cols)
 

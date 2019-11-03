@@ -22,9 +22,7 @@
     df2 = jdf"a.jdf"
 
     @test ncol(df2) == 3009
-    @test nrow(df2) == 100
-
-    JDF.eachcol
+    @test nrow(df2) == 100    
 
     df3 = [a for a in eachcol(df2)]
 
