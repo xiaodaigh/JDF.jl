@@ -82,7 +82,9 @@ savejdf(outdir, df::AbstractDataFrame; verbose = false) = begin
         version = v"0.2"
     )
 
-    serialize(joinpath(outdir, "metadata.jls"), fnl_metadata)
+    open(joinpath(outdir, "metadata.jls"), "w") do io
+        serialize(io, fnl_metadata)
+    end
     fnl_metadata
 end
 
@@ -110,7 +112,9 @@ ssavejdf(outdir, df::DataFrame) = begin
         version = v"0.2"
     )
 
-    serialize(joinpath(outdir, "metadata.jls"), fnl_metadata)
+    open(joinpath(outdir, "metadata.jls"), "w") do io
+        serialize(io, fnl_metadata)
+    end
     fnl_metadata
 end
 
