@@ -9,7 +9,7 @@ version is used.
 """
 loadjdf(indir; cols = Symbol[], verbose = false) = begin
 	if VERSION < v"1.3.0-rc1.0"
-		return sloadjdf(indir, verbose = verbose)
+		return sloadjdf(indir, cols = cols, verbose = verbose)
 	end
 
 	if verbose
