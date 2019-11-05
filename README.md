@@ -172,6 +172,11 @@ and `Float*` `Date*` types etc.
 `RLEVectors` support will be considered in the future when `missing` support
 arrives for `RLEVectors.jl`.
 
+## Resources
+
+[@bkamins](https://github.com/bkamins/)'s [excellent DataFrames.jl tutorial](https://github.com/bkamins/Julia-DataFrames-Tutorial/blob/master/04_loadsave.ipynb) contains a section on using JDF.jl.
+
+
 ## How does JDF work?
 When saving a JDF, each vector is Blosc compressed (using the default settings)
 if possible; this includes all `T` and `Unions{Missing, T}` types where `T` is
