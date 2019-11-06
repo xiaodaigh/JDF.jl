@@ -174,7 +174,7 @@ arrives for `RLEVectors.jl`.
 
 ## Resources
 
-[@bkamins](https://github.com/bkamins/)'s [excellent DataFrames.jl tutorial](https://github.com/bkamins/Julia-DataFrames-Tutorial/blob/master/04_loadsave.ipynb) contains a section on using JDF.jl.
+[@bkamins](https://github.com/bkamins/)'s excellent [DataFrames.jl tutorial](https://github.com/bkamins/Julia-DataFrames-Tutorial/blob/master/04_loadsave.ipynb) contains a section on using JDF.jl.
 
 
 ## How does JDF work?
