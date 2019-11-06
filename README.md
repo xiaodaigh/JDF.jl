@@ -190,7 +190,6 @@ I fully intend to develop JDF.jl into a language neutral format by version v0.4.
 
 ## Notes
 
-* Julia 1.0 is not supported as the `serialize` function used by JDF.jl is only available from 1.1.
 * Parallel read and write support is only available from Julia 1.3.
 * The design of JDF was inspired by [fst](fstpackage.org) in terms of using compressions and allowing random-access to columns
 
