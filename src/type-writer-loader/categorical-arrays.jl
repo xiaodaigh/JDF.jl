@@ -10,9 +10,8 @@ column_loader(b::Type{CategoricalVector}, io, metadata) = begin
     refs_meta = metadata.refs
     pi_meta = metadata.poolindex
     ref = column_loader(refs_meta.type, io, refs_meta)
-    poolindex = column_loader(pi_meta.type, io, pi_meta)
-    #return ref, pi_meta.type,  poolindex, metadata.ordered
-    CategoricalArray{pi_meta.type, 1}(ref, CategoricalPool(Array(poolindex), metadata.ordered))
+    poolindex = column_loader(pi_meta.type, io, pi_meta)        
+    CategoricalArray{pi_meta.type, 1}(ref, CategoricalPool{eltype(poolindex), eltype(ref)}(Array(poolindex), metadata.ordered))
 end
 
 if false
