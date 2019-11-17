@@ -65,7 +65,7 @@ JDFFile(path_to_JDF)
 ```
 
 #### Using `df[rows, cols]` syntax
-You can load 
+You can load arbitrary `rows` and `cols` using the `df[rows, cols]` syntax. However, some of these operations are not yet optimized and hence may not be efficient.
 
 ```julia
 a = JDFFile("iris.jdf")
@@ -80,9 +80,9 @@ a[:, [:Species, :PetalLength]] # load Species and PetalLength column
 @view(a[!, [:Species, :PetalLength]]) # load Species and PetalLength column
 ```
 
-In fact most syntax for `a[rows, cols]` will work **expect** for assignments i.e. `a[!, cols] = something` will **not** work.
+In fact most syntax for `a[rows, cols]` will work **except** for assignments i.e. `a[!, cols] = something` will **not** work.
 
-This was developed to make it possible for [JLBoost.jl](https://github.com/xiaodaigh/JLBooost.jl) to fit models without loading the whole data into memory, and so the functionalities is kept to a minimum for now.
+This was developed to make it possible for [JLBoost.jl](https://github.com/xiaodaigh/JLBoost.jl) to fit models without loading the whole data into memory, and so the functionalities is kept to a minimum for now.
 
 #### Metadata Names & Size from disk
 You can obtain the column names and size (`nrow` and `ncol`) of a JDF, for
