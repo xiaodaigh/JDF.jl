@@ -53,11 +53,8 @@ a2_selected = loadjdf("iris.jdf", cols = [:species, :sepalLength, :petalWidth])
 The difference with loading the whole datasets and then subsetting the columns
 is that it saves time as only the selected columns are loaded from disk.
 
-### Some `DataFrame`-like convenient syntax
-
-### Metadata Names & Size from disk
-You can create a variable of type `JDFFile` that allows you to access some
-metadata about the JDF on disk.
+### Some `DataFrame`-like convenience syntax/functions
+To take advatnage of some these convenience functions, you need to create a variable of type `JDFFile` pointed to the JDF file on disk. For example
 
 ```julia
 jdf"path/to/JDF.jdf"
@@ -66,6 +63,28 @@ or
 ```julia
 JDFFile(path_to_JDF)
 ```
+
+#### Using `df[rows, cols]` syntax
+You can load 
+
+```julia
+a = JDFFile("iris.jdf")
+
+a[!, :Species] # load Species column
+a[!, [:Species, :PetalLength]] # load Species and PetalLength column
+
+a[:, :Species] # load Species column
+a[:, [:Species, :PetalLength]] # load Species and PetalLength column
+
+@view(a[!, :Species]) # load Species column
+@view(a[!, [:Species, :PetalLength]]) # load Species and PetalLength column
+```
+
+In fact most syntax for `a[rows, cols]` will work **expect** for assignments i.e. `a[!, cols] = something` will **not** work.
+
+This was developed to make it possible for [JLBoost.jl](https://github.com/xiaodaigh/JLBooost.jl) to fit models without loading the whole data into memory, and so the functionalities is kept to a minimum for now.
+
+#### Metadata Names & Size from disk
 You can obtain the column names and size (`nrow` and `ncol`) of a JDF, for
 example:
 
