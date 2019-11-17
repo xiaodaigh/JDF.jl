@@ -53,6 +53,8 @@ a2_selected = loadjdf("iris.jdf", cols = [:species, :sepalLength, :petalWidth])
 The difference with loading the whole datasets and then subsetting the columns
 is that it saves time as only the selected columns are loaded from disk.
 
+### Some `DataFrame`-like convenient syntax
+
 ### Metadata Names & Size from disk
 You can create a variable of type `JDFFile` that allows you to access some
 metadata about the JDF on disk.

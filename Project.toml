@@ -1,7 +1,7 @@
 name = "JDF"
 uuid = "babc3d20-cd49-4f60-a736-a8f9c08892d3"
 authors = ["Dai ZJ <zhuojia.dai@gmail.com>"]
-version = "0.2.6"
+version = "0.2.7"
 
 [deps]
 Blosc = "a74b3585-a348-5f62-a45c-50e91977d574"

@@ -21,7 +21,7 @@ end
 @testset "Guard against Github #27" begin
     iris = dataset("datasets", "iris")
     savejdf(iris, "iris.jdf")
-    loadjdf(iris, "iris.jdf")
+    loadjdf("iris.jdf")
 
     rm("iris.jdf", force = true, recursive = true)
 end
