@@ -16,7 +16,7 @@ some_elm(::Type{T}) where T = begin
                 try
                     Vector{T}(undef, 1)[1]
                 catch
-                    throw("the type $T is not supported by JDF.jl yet. Try to update JDF.jl. If it still doesn't work after update, please submit an issue with a Minimal Working Example (MWE) at https://github.com/xiaodaigh/JDF.jl/issues")
+                    throw("the type $T is not supported by JDF.jl yet. Try to update JDF.jl. If it still doesn't work after update, please submit an issue at https://github.com/xiaodaigh/JDF.jl/issues")
                 end
             end
         end
@@ -43,11 +43,6 @@ supported
 
 """
 savejdf(df::AbstractDataFrame, outdir::AbstractString) = savejdf(outdir, df)
-
-# begin: two partial functions to make it play nice with pipes |> 
-savejdf(df::AbstractDataFrame; kwargs...) = outdir->savejdf(outdir, df; kwargs...)
-savejdf(outdir::AbstractString; kwargs...) = df->savejdf(outdir, df; kwargs...)
-# end: two partial functions to make it play nice with pipes |> 
 
 savejdf(outdir, df::AbstractDataFrame; verbose = false) = begin
     if VERSION < v"1.3.0-rc1"
@@ -96,7 +91,7 @@ end
 """
     serially save a DataFrames to the outdir
 """
-ssavejdf(outdir, df::DataFrame; verbose = false) = begin
+ssavejdf(outdir, df::AbstractDataFrame) = begin
     pmetadatas = Any[missing for i = 1:length(DataFrames.names(df))]
 
     if !isdir(outdir)
@@ -143,3 +138,4 @@ get_bytes(metadata) = begin
 end
 
 hasfieldnames(::Type{T}) where {T} = fieldnames(T) >= 1
+
