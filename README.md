@@ -84,6 +84,27 @@ In fact most syntax for `a[rows, cols]` will work **except** for assignments i.e
 
 This was developed to make it possible for [JLBoost.jl](https://github.com/xiaodaigh/JLBoost.jl) to fit models without loading the whole data into memory, and so the functionalities is kept to a minimum for now.
 
+#### Load each column from disk
+You can load each column of a JDF file from disk using iterations
+
+```julia
+jdffile = jdf"iris.jdf"
+for col in eachcol(jdffile)  
+  # do something to col
+  # where `col` is the content of one column of iris.jdf
+end
+```
+
+To iterate through the columns names and the `col`
+
+```julia
+jdffile = jdf"iris.jdf"
+for (name, col) in zip(names(jdffile), eachcol(jdffile))
+  # `name::Symbol` is the name of the column
+  #  `col` is the content of one column of iris.jdf
+end
+```
+
 #### Metadata Names & Size from disk
 You can obtain the column names and size (`nrow` and `ncol`) of a JDF, for
 example:
@@ -139,26 +160,7 @@ type_compress!(df, compress_float = true)
 `String` compression is _planned_ and will likely employ categorical encoding
 combined with RLE encoding.
 
-### Load each column from disk
-You can load each column of a JDF file from disk
 
-```julia
-jdffile = jdf"iris.jdf"
-for col in eachcol(jdffile)  
-  # do something to col
-  # where `col` is the content of one column of iris.jdf
-end
-```
-
-To iterate through the columns names and the `col`
-
-```julia
-jdffile = jdf"iris.jdf"
-for (name, col) in zip(names(jdffile), eachcol(jdffile))
-  # `name::Symbol` is the name of the column
-  #  `col` is the content of one column of iris.jdf
-end
-```
 
 ## Benchmarks
 Here are some benchmarks using the [Fannie Mae Mortgage
