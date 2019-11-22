@@ -85,7 +85,8 @@ savejdf(outdir, df::AbstractDataFrame; verbose = false) = begin
     open(joinpath(outdir, "metadata.jls"), "w") do io
         serialize(io, fnl_metadata)
     end
-    fnl_metadata
+    #fnl_metadata
+    JDFFile(outdir)
 end
 
 """
@@ -115,7 +116,7 @@ ssavejdf(outdir, df::AbstractDataFrame) = begin
     open(joinpath(outdir, "metadata.jls"), "w") do io
         serialize(io, fnl_metadata)
     end
-    fnl_metadata
+    JDFFile(outdir)
 end
 
 # figure out from metadata how much space is allocated
@@ -138,4 +139,3 @@ get_bytes(metadata) = begin
 end
 
 hasfieldnames(::Type{T}) where {T} = fieldnames(T) >= 1
-
