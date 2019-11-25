@@ -72,8 +72,8 @@ loadjdf(indir; cols = Symbol[], verbose = false) = begin
  	df
 end
 
-loadjdf(jdf::JDFFile; args...) = loadjdf(jdf.path; args...)
-sloadjdf(jdf::JDFFile; args...) = sloadjdf(jdf.path; args...)
+loadjdf(jdf::JDFFile; args...) = loadjdf(path(jdf); args...)
+sloadjdf(jdf::JDFFile; args...) = sloadjdf(path(jdf); args...)
 
 # load the data from file with a schema
 sloadjdf(indir; cols = Symbol[], verbose = false) = begin
