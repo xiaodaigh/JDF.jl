@@ -14,7 +14,9 @@ end
 
 Load the metadata associated with the JDF in `indir`
 """
-metadata(jdf::JDFFile) = jdfmetadata(jdf.path)
+metadata(jdf::JDFFile) = jdfmetadata(path(jdf))
+
+
 
 """
     JDF.names(indir)
