@@ -1,7 +1,7 @@
 name = "JDF"
 uuid = "babc3d20-cd49-4f60-a736-a8f9c08892d3"
 authors = ["Dai ZJ <zhuojia.dai@gmail.com>"]
-version = "0.2.8"
+version = "0.2.9"
 
 [deps]
 Blosc = "a74b3585-a348-5f62-a45c-50e91977d574"
@@ -21,7 +21,7 @@ Blosc = "0.5"
 BufferedStreams = "1.0"
 CSV = "0.5"
 CategoricalArrays = "0.5, 0.6, 0.7"
-DataFrames = "0.19"
+DataFrames = "0.19, 0.20"
 Missings = "0.4"
 StatsBase = "0.32"
 Tables = "0.2"
