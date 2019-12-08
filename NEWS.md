@@ -1,3 +1,6 @@
+## 0.2.9
+Updated dep to allow DataFrames.jl v0.20.0
+
 ## 0.2.8
 Tables.jl support
 `savejdf` now return the `JDFFile` instead of the metadata
