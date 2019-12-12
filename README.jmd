@@ -26,7 +26,9 @@ The next version of JDF which is v0.3 will contain breaking changes. But don't w
 ```julia
 using RDatasets, JDF, DataFrames
 
-a = dataset("datasets", "iris")
+a = dataset("datasets", "iris");
+
+head(a, 2)
 ```
 
 ### *Saving* and *Loading* data
