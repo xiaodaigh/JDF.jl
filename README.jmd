@@ -28,7 +28,7 @@ using RDatasets, JDF, DataFrames
 
 a = dataset("datasets", "iris");
 
-head(a, 2)
+first(a, 2)
 ```
 
 ### *Saving* and *Loading* data
