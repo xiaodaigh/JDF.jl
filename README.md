@@ -26,12 +26,14 @@ The next version of JDF which is v0.3 will contain breaking changes. But don't w
 ````julia
 using RDatasets, JDF, DataFrames
 
-a = dataset("datasets", "iris")
+a = dataset("datasets", "iris");
+
+head(a, 2)
 ````
 
 
 ````
-150×5 DataFrame
+2×5 DataFrames.DataFrame
 │ Row │ SepalLength │ SepalWidth │ PetalLength │ PetalWidth │ Species      
 │
 │     │ Float64     │ Float64    │ Float64     │ Float64    │ Categorical… 
@@ -41,33 +43,6 @@ a = dataset("datasets", "iris")
 │ 1   │ 5.1         │ 3.5        │ 1.4         │ 0.2        │ setosa       
 │
 │ 2   │ 4.9         │ 3.0        │ 1.4         │ 0.2        │ setosa       
-│
-│ 3   │ 4.7         │ 3.2        │ 1.3         │ 0.2        │ setosa       
-│
-│ 4   │ 4.6         │ 3.1        │ 1.5         │ 0.2        │ setosa       
-│
-│ 5   │ 5.0         │ 3.6        │ 1.4         │ 0.2        │ setosa       
-│
-│ 6   │ 5.4         │ 3.9        │ 1.7         │ 0.4        │ setosa       
-│
-│ 7   │ 4.6         │ 3.4        │ 1.4         │ 0.3        │ setosa       
-│
-⋮
-│ 143 │ 5.8         │ 2.7        │ 5.1         │ 1.9        │ virginica    
-│
-│ 144 │ 6.8         │ 3.2        │ 5.9         │ 2.3        │ virginica    
-│
-│ 145 │ 6.7         │ 3.3        │ 5.7         │ 2.5        │ virginica    
-│
-│ 146 │ 6.7         │ 3.0        │ 5.2         │ 2.3        │ virginica    
-│
-│ 147 │ 6.3         │ 2.5        │ 5.0         │ 1.9        │ virginica    
-│
-│ 148 │ 6.5         │ 3.0        │ 5.2         │ 2.0        │ virginica    
-│
-│ 149 │ 6.2         │ 3.4        │ 5.4         │ 2.3        │ virginica    
-│
-│ 150 │ 5.9         │ 3.0        │ 5.1         │ 1.8        │ virginica    
 │
 ````
 
@@ -85,7 +60,7 @@ Julia 1.3. For Julia < 1.3, it saves and loads using one thread only.
 
 
 ````
-0.011163 seconds (405 allocations: 669.094 KiB)
+0.748441 seconds (2.50 M allocations: 126.151 MiB, 5.03% gc time)
 ````
 
 
@@ -96,8 +71,8 @@ Julia 1.3. For Julia < 1.3, it saves and loads using one thread only.
 
 
 ````
-0.000498 seconds (642 allocations: 686.938 KiB)
-150×5 DataFrame
+0.779215 seconds (1.72 M allocations: 86.003 MiB)
+150×5 DataFrames.DataFrame
 │ Row │ SepalLength │ SepalWidth │ PetalLength │ PetalWidth │ Species      
 │
 │     │ Float64     │ Float64    │ Float64     │ Float64    │ Categorical… 
@@ -165,7 +140,7 @@ a2_selected = loadjdf("iris.jdf", cols = [:Species, :SepalLength, :PetalWidth])
 
 
 ````
-150×3 DataFrame
+150×3 DataFrames.DataFrame
 │ Row │ SepalLength │ PetalWidth │ Species      │
 │     │ Float64     │ Float64    │ Categorical… │
 ├─────┼─────────────┼────────────┼──────────────┤
@@ -202,7 +177,7 @@ jdf"path/to/JDF.jdf"
 
 
 ````
-JDFFile{String}("path/to/JDF.jdf")
+JDF.JDFFile{String}("path/to/JDF.jdf")
 ````
 
 
@@ -216,7 +191,7 @@ JDFFile(path_to_JDF)
 
 
 ````
-JDFFile{String}("path/to/JDF.jdf")
+JDF.JDFFile{String}("path/to/JDF.jdf")
 ````
 
 
@@ -241,7 +216,7 @@ afile[:, [:Species, :PetalLength]] # load Species and PetalLength column
 
 
 ````
-150×2 DataFrame
+150×2 DataFrames.DataFrame
 │ Row │ PetalLength │ Species      │
 │     │ Float64     │ Categorical… │
 ├─────┼─────────────┼──────────────┤
@@ -292,7 +267,7 @@ Tables.columns(ajdf)
 
 
 ````
-JDFFile{String}("iris.jdf")
+JDF.JDFFile{String}("iris.jdf")
 ````
 
 
@@ -305,15 +280,15 @@ Tables.schema(ajdf)
 ````
 Tables.Schema:
  :SepalLength  …  Float64                                                  
-              
+                                
  :SepalWidth      Float64                                                  
-              
+                                
  :PetalLength     Float64                                                  
-              
+                                
  :PetalWidth      Float64                                                  
-              
- :Species         CategoricalArray{T,1,V,C,U,U1} where U1 where U where C w
-here V where T
+                                
+ :Species         CategoricalArrays.CategoricalArray{T,1,V,C,U,U1} where U1
+ where U where C where V where T
 ````
 
 
@@ -324,7 +299,7 @@ getproperty(Tables.columns(ajdf), :Species)
 
 
 ````
-150-element CategoricalArray{String,1,UInt8}:
+150-element CategoricalArrays.CategoricalArray{String,1,UInt8}:
  "setosa"   
  "setosa"   
  "setosa"   
@@ -421,7 +396,7 @@ serially, i.e. without using parallel processes.
 
 
 ````
-0.038876 seconds (5.74 k allocations: 933.871 KiB)
+0.064414 seconds (214.17 k allocations: 11.695 MiB)
 ````
 
 
@@ -432,8 +407,8 @@ serially, i.e. without using parallel processes.
 
 
 ````
-0.032023 seconds (82.13 k allocations: 4.998 MiB)
-150×5 DataFrame
+0.025039 seconds (10.29 k allocations: 1.152 MiB)
+150×5 DataFrames.DataFrame
 │ Row │ SepalLength │ SepalWidth │ PetalLength │ PetalWidth │ Species      
 │
 │     │ Float64     │ Float64    │ Float64     │ Float64    │ Categorical… 
@@ -488,7 +463,7 @@ type_compress!(df)
 
 
 ````
-3×2 DataFrame
+3×2 DataFrames.DataFrame
 │ Row │ a    │ b    │
 │     │ Int8 │ Int8 │
 ├─────┼──────┼──────┤
@@ -511,7 +486,7 @@ type_compress!(df, compress_float = true)
 
 
 ````
-3×2 DataFrame
+3×2 DataFrames.DataFrame
 │ Row │ a    │ b    │
 │     │ Int8 │ Int8 │
 ├─────┼──────┼──────┤
