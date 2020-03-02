@@ -1,3 +1,6 @@
+## 0.2.11
+Updated to Tables v1
+
 ## 0.2.9
 Updated dep to allow DataFrames.jl v0.20.0
 

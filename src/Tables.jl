@@ -2,6 +2,8 @@ import Tables: rows, columns, istable, rowaccess, columnaccess, schema, Schema
 
 import Base: propertynames, getproperty
 
+export istable
+
 istable(::Type{JDFFile}) = true
 istable(::JDFFile) = true
 
