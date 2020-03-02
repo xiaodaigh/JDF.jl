@@ -40,7 +40,7 @@ export column_loader, column_loader!
 export type_compress!, type_compress
 export compress_then_write
 export JDFFile, @jdf_str, jdfmetadata, metadata, nrow, ncol, size, names
-export IsBitsType, eachcol, some_elm, getindex
+export IsBitsType, eachcol, some_elm, getindex, istable
 
 
 include("JDFFile.jl")
