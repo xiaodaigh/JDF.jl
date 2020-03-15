@@ -1,7 +1,7 @@
 name = "JDF"
 uuid = "babc3d20-cd49-4f60-a736-a8f9c08892d3"
 authors = ["Dai ZJ <zhuojia.dai@gmail.com>"]
-version = "0.2.11"
+version = "0.2.12"
 
 [deps]
 Blosc = "a74b3585-a348-5f62-a45c-50e91977d574"
@@ -17,7 +17,7 @@ TimeZones = "f269a46b-ccf7-5d73-abea-4c690281aa53"
 WeakRefStrings = "ea10d353-3f73-51f8-a26c-33c1cb351aa5"
 
 [compat]
-Blosc = "0.5"
+Blosc = "0.6"
 BufferedStreams = "1.0"
 CSV = "0.5"
 CategoricalArrays = "0.5, 0.6, 0.7"
