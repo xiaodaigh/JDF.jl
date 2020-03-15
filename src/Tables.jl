@@ -4,8 +4,8 @@ import Base: propertynames, getproperty
 
 export istable
 
-istable(::Type{JDFFile}) = true
-istable(::JDFFile) = true
+Tables.istable(::Type{JDFFile}) = true
+Tables.istable(::JDFFile) = true
 
 rowaccess(::JDFFile) = false
 columnaccess(::JDFFile) = true
