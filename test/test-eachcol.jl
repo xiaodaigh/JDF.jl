@@ -1,3 +1,8 @@
+using Test
+using DataFrames
+using Random: randstring
+using WeakRefStrings: StringVector
+
 @testset "JDF.jl eachcol" begin
     df = DataFrame([collect(1:100) for i =1:3000])
     df[!, :int_missing] =
@@ -22,7 +27,7 @@
     df2 = jdf"a.jdf"
 
     @test ncol(df2) == 3009
-    @test nrow(df2) == 100    
+    @test nrow(df2) == 100
 
     df3 = [a for a in eachcol(df2)]
 
