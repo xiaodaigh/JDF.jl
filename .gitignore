@@ -6,3 +6,5 @@ src/.ipynb_checkpoints/
 
 test/.ipynb_checkpoints/
 iris.jdf
+*.bin
+*.csv
