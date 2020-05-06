@@ -8,7 +8,7 @@ import Base: iterate, length
 
 struct JDFFileColIterator
     jdf::JDFFile
-    cols::Vector{Symbol}
+    cols::Vector{Union{String, Symbol}}
 end
 
 eachcol(jdf::JDFFile) = JDFFileColIterator(jdf, names(jdf))
