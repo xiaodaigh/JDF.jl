@@ -17,7 +17,7 @@ TimeZones = "f269a46b-ccf7-5d73-abea-4c690281aa53"
 WeakRefStrings = "ea10d353-3f73-51f8-a26c-33c1cb351aa5"
 
 [compat]
-Blosc = "0.5, 0.6"
+Blosc = "0.5, 0.6, 0.7"
 BufferedStreams = "1.0"
 CSV = "0.5, 0.6"
 CategoricalArrays = "0.5, 0.6, 0.7"
