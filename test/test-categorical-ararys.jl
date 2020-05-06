@@ -1,14 +1,14 @@
 using Test
-# using Revise
 using JDF
-using RDatasets
+#using RDatasets
+using DataFrames: DataFrame
+using CategoricalArrays
 
 @testset "JDF.jl categorical arrays" begin
     df = DataFrame([collect(1:100) for i =1:3])
     df[!, :x1] = categorical(df[!, :x1])
     df[!, :x2] = categorical(string.(df[!, :x2]))
-    savejdf("a3cate.jdf", df)
-
+    savejdf(df, "a3cate.jdf")
     df2 = loadjdf("a3cate.jdf", cols=[:x2, :x1])
     @test size(df2, 2) == 2
     @test size(df2, 1) == 100
@@ -19,9 +19,9 @@ using RDatasets
 end
 
 @testset "Guard against Github #27" begin
-    iris = dataset("datasets", "iris")
-    savejdf(iris, "iris.jdf")
-    loadjdf("iris.jdf")
-
-    rm("iris.jdf", force = true, recursive = true)
+    # iris = dataset("datasets", "iris")
+    # savejdf(iris, "iris.jdf")
+    # loadjdf("iris.jdf")
+    #
+    # rm("iris.jdf", force = true, recursive = true)
 end
