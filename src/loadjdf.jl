@@ -8,6 +8,9 @@ Load a `DataFrame` from JDF saved at `outdir`. On Julia > v1.3, a multithreaded
 version is used.
 """
 loadjdf(indir; cols = Symbol[], verbose = false) = begin
+	# starting from DataFrames.jl 0.21 the colnames are strings
+    cols = string.(cols)
+
 	if VERSION < v"1.3.0-rc1.0"
 		return sloadjdf(indir, cols = cols, verbose = verbose)
 	end
