@@ -1,10 +1,12 @@
-# JDF
+# What is JDF.jl?
 
-A Julia `DataFrame`s serialization format with the following goals
+JDF is a `DataFrame`s serialization format with the following goals
 * Fast save and load times
 * Compressed storage on disk
 * Enable disk-based data manipulation (not yet achieved; from v0.4.0)
 * Supports machine learning workloads, e.g. mini-batch, sampling (not yet achieved; from v0.4.0)
+
+JDF.jl is the Julia pacakge for all things related to JDF.
 
 JDF stores a `DataFrame` in a folder with each column stored as a separate file.
 There is also a `metadata.jls` file that stores metadata about the original
