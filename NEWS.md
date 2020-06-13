@@ -1,3 +1,6 @@
+## 0.2.16
+Updated to DataFrames v0.21
+
 ## 0.2.11
 Updated to Tables v1
 

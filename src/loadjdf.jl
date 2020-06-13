@@ -11,7 +11,7 @@ loadjdf(indir; cols = Symbol[], verbose = false) = begin
 	# starting from DataFrames.jl 0.21 the colnames are strings
     cols = string.(cols)
 
-	if VERSION < v"1.3.0-rc1.0"
+	if VERSION < v"1.3.0"
 		return sloadjdf(indir, cols = cols, verbose = verbose)
 	end
 
@@ -24,9 +24,9 @@ loadjdf(indir; cols = Symbol[], verbose = false) = begin
 	end
 
 	if length(cols) == 0
-		cols = metadatas.names
+		cols = string.(metadatas.names)
 	else
-		scmn = setdiff(cols, metadatas.names)
+		scmn = setdiff(cols, string.(metadatas.names))
 		if length(scmn) > 0
 			throw("columns $(reduce((x,y) -> string(x) * ", " * string(y), scmn)) are not available, please ensure you have spelt them correctly")
 		end
@@ -45,31 +45,33 @@ loadjdf(indir; cols = Symbol[], verbose = false) = begin
 
 	i = 1
     for (name, metadata) in zip(metadatas.names, metadatas.metadatas)
-		if name in cols
+        name_str = string(name)
+		if name_str in cols
 			put!(c1, true)
 			results[i] = @spawn begin
 				io = BufferedInputStream(open(joinpath(indir,string(name)), "r"))
 				new_result = column_loader(metadata.type, io, metadata)
 				close(io)
-				(name = name, task = new_result)
+				(name = name_str, task = new_result)
 			end
 			take!(c1)
 			i+=1
 		end
     end
 
-	# run this serially
-	for result in results
+    # run this serially
+    #println(results)
+    for result in results
 		if verbose
-			println("Extracting $(result.name)")
+			println("Extracting $(fetch(result).name)")
 		end
 
 		new_result = fetch(result).task
 		colname = fetch(result).name
 		if new_result == nothing
-			df[!, colname] = Vector{Missing}(missing, metadatas.rows)
-		else
-			df[!, colname] = new_result
+			df[!, Symbol(colname)] = Vector{Missing}(missing, metadatas.rows)
+        else
+			df[!, Symbol(colname)] = new_result
 		end
 	end
  	df

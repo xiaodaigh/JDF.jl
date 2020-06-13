@@ -1,7 +1,9 @@
+using DataAPI
+
 compress_then_write(b::CategoricalVector{T, IntType}, io) where {T, IntType <: Integer} = begin
     #println("abc")
     compress_refs = compress_then_write(b.refs, io)
-    compress_poolindex = compress_then_write(b.pool.levels, io)
+    compress_poolindex = compress_then_write(DataAPI.levels(b), io)
 
     (type = CategoricalVector, refs = compress_refs, poolindex = compress_poolindex, ordered = b.pool.ordered)
 end
