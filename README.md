@@ -1,10 +1,12 @@
-# JDF
+# What is JDF.jl?
 
-A Julia `DataFrame`s serialization format with the following goals
+JDF is a `DataFrame`s serialization format with the following goals
 * Fast save and load times
 * Compressed storage on disk
 * Enable disk-based data manipulation (not yet achieved; from v0.4.0)
 * Supports machine learning workloads, e.g. mini-batch, sampling (not yet achieved; from v0.4.0)
+
+JDF.jl is the Julia pacakge for all things related to JDF.
 
 JDF stores a `DataFrame` in a folder with each column stored as a separate file.
 There is also a `metadata.jls` file that stores metadata about the original
@@ -28,12 +30,12 @@ using RDatasets, JDF, DataFrames
 
 a = dataset("datasets", "iris");
 
-head(a, 2)
+first(a, 2)
 ````
 
 
 ````
-2×5 DataFrames.DataFrame
+2×5 DataFrame
 │ Row │ SepalLength │ SepalWidth │ PetalLength │ PetalWidth │ Species      
 │
 │     │ Float64     │ Float64    │ Float64     │ Float64    │ Categorical… 
@@ -60,7 +62,7 @@ Julia 1.3. For Julia < 1.3, it saves and loads using one thread only.
 
 
 ````
-0.748441 seconds (2.50 M allocations: 126.151 MiB, 5.03% gc time)
+0.004860 seconds (354 allocations: 668.750 KiB)
 ````
 
 
@@ -71,8 +73,8 @@ Julia 1.3. For Julia < 1.3, it saves and loads using one thread only.
 
 
 ````
-0.779215 seconds (1.72 M allocations: 86.003 MiB)
-150×5 DataFrames.DataFrame
+0.000784 seconds (680 allocations: 691.328 KiB)
+150×5 DataFrame
 │ Row │ SepalLength │ SepalWidth │ PetalLength │ PetalWidth │ Species      
 │
 │     │ Float64     │ Float64    │ Float64     │ Float64    │ Categorical… 
@@ -140,7 +142,7 @@ a2_selected = loadjdf("iris.jdf", cols = [:Species, :SepalLength, :PetalWidth])
 
 
 ````
-150×3 DataFrames.DataFrame
+150×3 DataFrame
 │ Row │ SepalLength │ PetalWidth │ Species      │
 │     │ Float64     │ Float64    │ Categorical… │
 ├─────┼─────────────┼────────────┼──────────────┤
@@ -177,7 +179,7 @@ jdf"path/to/JDF.jdf"
 
 
 ````
-JDF.JDFFile{String}("path/to/JDF.jdf")
+JDFFile{String}("path/to/JDF.jdf")
 ````
 
 
@@ -191,7 +193,7 @@ JDFFile(path_to_JDF)
 
 
 ````
-JDF.JDFFile{String}("path/to/JDF.jdf")
+JDFFile{String}("path/to/JDF.jdf")
 ````
 
 
@@ -216,26 +218,26 @@ afile[:, [:Species, :PetalLength]] # load Species and PetalLength column
 
 
 ````
-150×2 DataFrames.DataFrame
-│ Row │ PetalLength │ Species      │
-│     │ Float64     │ Categorical… │
-├─────┼─────────────┼──────────────┤
-│ 1   │ 1.4         │ setosa       │
-│ 2   │ 1.4         │ setosa       │
-│ 3   │ 1.3         │ setosa       │
-│ 4   │ 1.5         │ setosa       │
-│ 5   │ 1.4         │ setosa       │
-│ 6   │ 1.7         │ setosa       │
-│ 7   │ 1.4         │ setosa       │
+150×2 DataFrame
+│ Row │ Species      │ PetalLength │
+│     │ Categorical… │ Float64     │
+├─────┼──────────────┼─────────────┤
+│ 1   │ setosa       │ 1.4         │
+│ 2   │ setosa       │ 1.4         │
+│ 3   │ setosa       │ 1.3         │
+│ 4   │ setosa       │ 1.5         │
+│ 5   │ setosa       │ 1.4         │
+│ 6   │ setosa       │ 1.7         │
+│ 7   │ setosa       │ 1.4         │
 ⋮
-│ 143 │ 5.1         │ virginica    │
-│ 144 │ 5.9         │ virginica    │
-│ 145 │ 5.7         │ virginica    │
-│ 146 │ 5.2         │ virginica    │
-│ 147 │ 5.0         │ virginica    │
-│ 148 │ 5.2         │ virginica    │
-│ 149 │ 5.4         │ virginica    │
-│ 150 │ 5.1         │ virginica    │
+│ 143 │ virginica    │ 5.1         │
+│ 144 │ virginica    │ 5.9         │
+│ 145 │ virginica    │ 5.7         │
+│ 146 │ virginica    │ 5.2         │
+│ 147 │ virginica    │ 5.0         │
+│ 148 │ virginica    │ 5.2         │
+│ 149 │ virginica    │ 5.4         │
+│ 150 │ virginica    │ 5.1         │
 ````
 
 
@@ -267,7 +269,7 @@ Tables.columns(ajdf)
 
 
 ````
-JDF.JDFFile{String}("iris.jdf")
+JDFFile{String}("iris.jdf")
 ````
 
 
@@ -279,16 +281,12 @@ Tables.schema(ajdf)
 
 ````
 Tables.Schema:
- :SepalLength  …  Float64                                                  
-                                
- :SepalWidth      Float64                                                  
-                                
- :PetalLength     Float64                                                  
-                                
- :PetalWidth      Float64                                                  
-                                
- :Species         CategoricalArrays.CategoricalArray{T,1,V,C,U,U1} where U1
- where U where C where V where T
+ :SepalLength  …  Float64
+ :SepalWidth      Float64
+ :PetalLength     Float64
+ :PetalWidth      Float64
+ :Species         CategoricalArray{T,1,V,C,U,U1} where U1 where U where C w
+here V where T
 ````
 
 
@@ -299,18 +297,18 @@ getproperty(Tables.columns(ajdf), :Species)
 
 
 ````
-150-element CategoricalArrays.CategoricalArray{String,1,UInt8}:
- "setosa"   
- "setosa"   
- "setosa"   
- "setosa"   
- "setosa"   
- "setosa"   
- "setosa"   
- "setosa"   
- "setosa"   
- "setosa"   
- ⋮          
+150-element CategoricalArray{String,1,UInt8}:
+ "setosa"
+ "setosa"
+ "setosa"
+ "setosa"
+ "setosa"
+ "setosa"
+ "setosa"
+ "setosa"
+ "setosa"
+ "setosa"
+ ⋮
  "virginica"
  "virginica"
  "virginica"
@@ -396,7 +394,7 @@ serially, i.e. without using parallel processes.
 
 
 ````
-0.064414 seconds (214.17 k allocations: 11.695 MiB)
+0.003437 seconds (290 allocations: 663.203 KiB)
 ````
 
 
@@ -407,8 +405,8 @@ serially, i.e. without using parallel processes.
 
 
 ````
-0.025039 seconds (10.29 k allocations: 1.152 MiB)
-150×5 DataFrames.DataFrame
+0.000981 seconds (592 allocations: 683.828 KiB)
+150×5 DataFrame
 │ Row │ SepalLength │ SepalWidth │ PetalLength │ PetalWidth │ Species      
 │
 │     │ Float64     │ Float64    │ Float64     │ Float64    │ Categorical… 
@@ -463,7 +461,7 @@ type_compress!(df)
 
 
 ````
-3×2 DataFrames.DataFrame
+3×2 DataFrame
 │ Row │ a    │ b    │
 │     │ Int8 │ Int8 │
 ├─────┼──────┼──────┤
@@ -486,7 +484,7 @@ type_compress!(df, compress_float = true)
 
 
 ````
-3×2 DataFrames.DataFrame
+3×2 DataFrame
 │ Row │ a    │ b    │
 │     │ Int8 │ Int8 │
 ├─────┼──────┼──────┤
