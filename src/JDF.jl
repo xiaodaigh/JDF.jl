@@ -19,7 +19,7 @@ using CSV
 
 import DataFrames: nrow, ncol
 
-if VERSION >= v"1.3.0-rc1"
+if VERSION >= v"1.3.0"
     import Base.Threads: @spawn
 else
     macro spawn(_)
