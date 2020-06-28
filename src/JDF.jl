@@ -15,11 +15,10 @@ import Base: show, getindex, setindex!, eltype, names
 using Base:size#, @v_str, >=, include, VERSION
 
 using Serialization: serialize, deserialize
-using CSV
 
 import DataFrames: nrow, ncol
 
-if VERSION >= v"1.3.0-rc1"
+if VERSION >= v"1.3.0"
     import Base.Threads: @spawn
 else
     macro spawn(_)
@@ -28,7 +27,7 @@ else
 end
 
 function __init__()
-    if VERSION >= v"1.3.0-rc1"
+    if VERSION >= v"1.3.0"
         Blosc.set_num_threads(Threads.nthreads())
     else
         Blosc.set_num_threads(isdefined(Sys, :CPU_CORES) ? Sys.CPU_CORES : Sys.CPU_THREADS)
