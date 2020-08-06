@@ -13,7 +13,7 @@ There is also a `metadata.jls` file that stores metadata about the original
 `DataFrame`. Collectively, the column files, the metadata file, and the folder
 is called a JDF "file".
 
-`JDF.jl` is Julia-only solution and there are a lot of ways to do nifty things
+`JDF.jl` is a pure-Julia solution and there are a lot of ways to do nifty things
 like compression and encapsulating the underlying struture of the arrays that's
 hard to do in R and Python. E.g. Python's numpy arrays are C objects, but all
 the vector types used in JDF are Julia data types.
