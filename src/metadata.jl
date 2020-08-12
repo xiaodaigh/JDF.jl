@@ -4,7 +4,7 @@
 Load the metadata associated with the JDF in `indir`
 """
 jdfmetadata(indir) = begin
-    open(joinpath(indir,"metadata.jls")) do io
+    open(joinpath(indir, "metadata.jls")) do io
         deserialize(io)
     end
 end
@@ -61,8 +61,8 @@ Returns the JDF's `size`
 #     (m.rows, length(m.names))
 # end
 JDF.size(jdf::JDFFile) = begin
-     m = metadata(jdf)
-     (m.rows, length(m.names))
+    m = metadata(jdf)
+    (m.rows, length(m.names))
 end
 
 # JDF.size(path::AbstractString) = JDF.size(JDFFile(path))

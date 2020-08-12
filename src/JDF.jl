@@ -12,7 +12,7 @@ using StatsBase: rle, inverse_rle, countmap, sample
 
 import Base: show, getindex, setindex!, eltype, names
 
-using Base:size#, @v_str, >=, include, VERSION
+using Base: size#, @v_str, >=, include, VERSION
 
 using Serialization: serialize, deserialize
 

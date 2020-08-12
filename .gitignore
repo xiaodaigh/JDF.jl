@@ -8,3 +8,5 @@ test/.ipynb_checkpoints/
 iris.jdf
 *.bin
 *.csv
+julia-formatter/Manifest.toml
+julia-formatter/Project.toml

@@ -1,5 +1,5 @@
 column_loader(T::Type{Bool}, io, metadata) = begin
-# Bool are saved as UInt8
+    # Bool are saved as UInt8
     buffer = Vector{UInt8}(undef, metadata.len)
     readbytes!(io, buffer, metadata.len)
     Bool.(Blosc.decompress(UInt8, buffer))

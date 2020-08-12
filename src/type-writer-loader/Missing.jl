@@ -4,7 +4,7 @@ some_elm(::Type{Missing}) = missing
 # the dispatch for Union{T, Missing}
 # 1. comporess the missing
 # 2. and also load the missing
-compress_then_write(b::Vector{Union{T, Missing}}, io) where T = begin
+compress_then_write(b::Vector{Union{T,Missing}}, io) where {T} = begin
     S = nonmissingtype(eltype(b))
     b_S = coalesce.(b, some_elm(S))
 
@@ -14,15 +14,16 @@ compress_then_write(b::Vector{Union{T, Missing}}, io) where T = begin
     metadata2 = compress_then_write(b_m, io)
 
     (
-     Tmeta = metadata,
-     missingmeta = metadata2,
-     type = eltype(b),
-     len = max(metadata.len, metadata2.len),
+        Tmeta = metadata,
+        missingmeta = metadata2,
+        type = eltype(b),
+        len = max(metadata.len, metadata2.len),
     )
 end
 
 # just write it out as missing
-compress_then_write(b::Vector{Missing}, io) = (len = 0, type = Missing, orig_len = length(b))
+compress_then_write(b::Vector{Missing}, io) =
+    (len = 0, type = Missing, orig_len = length(b))
 
 column_loader!(buffer, ::Type{Union{Missing,T}}, io, metadata) where {T} = begin
     # read the content
@@ -37,4 +38,5 @@ column_loader!(buffer, ::Type{Union{Missing,T}}, io, metadata) where {T} = begin
     t_pre
 end
 
-column_loader!(buffer, ::Type{Missing}, io, metadata) = Vector{Missing}(missing, metadata.orig_len)
+column_loader!(buffer, ::Type{Missing}, io, metadata) =
+    Vector{Missing}(missing, metadata.orig_len)

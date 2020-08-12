@@ -3,7 +3,7 @@ using Test
 using JDF
 
 @testset "JDFFile" begin
-    df = DataFrame([collect(1:100) for i =1:3])
+    df = DataFrame([collect(1:100) for i = 1:3])
     df[!, :x1] = categorical(df[!, :x1])
     df[!, :x2] = categorical(string.(df[!, :x2]))
     savejdf("a3dfsyntax.jdf", df)
@@ -20,5 +20,5 @@ using JDF
 
     jdffile[rand(Bool, 100), :x1]
 
-    rm("a3dfsyntax.jdf", force=true, recursive=true)
+    rm("a3dfsyntax.jdf", force = true, recursive = true)
 end

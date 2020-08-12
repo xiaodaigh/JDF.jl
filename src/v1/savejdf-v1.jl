@@ -16,7 +16,7 @@ end
 """
     save a DataFrames to the outdir
 """
-savejdf_v1(outdir, df) =begin
+savejdf_v1(outdir, df) = begin
     if VERSION < v"1.3.0-rc1"
         return ssavejdf(outdir, df)
     end
@@ -29,12 +29,12 @@ savejdf_v1(outdir, df) =begin
 
     # use a bounded channel to limit
     c1 = Channel{Bool}(Threads.nthreads())
-    atexit(()->close(c1))
+    atexit(() -> close(c1))
 
     for (i, n) in enumerate(names(df))
         put!(c1, true)
         pmetadatas[i] = @spawn begin
-            io = BufferedOutputStream(open(joinpath(outdir, string(n)) ,"w"))
+            io = BufferedOutputStream(open(joinpath(outdir, string(n)), "w"))
             res = compress_then_write(Array(df[!, i]), io)
             close(io)
             res
@@ -44,11 +44,7 @@ savejdf_v1(outdir, df) =begin
 
     metadatas = fetch.(pmetadatas)
 
-    fnl_metadata = (
-        names = names(df),
-        rows = size(df, 1),
-        metadatas = metadatas
-    )
+    fnl_metadata = (names = names(df), rows = size(df, 1), metadatas = metadatas)
 
     serialize(joinpath(outdir, "metadata.jls"), fnl_metadata)
     fnl_metadata
@@ -71,11 +67,7 @@ ssavejdf_v1(outdir, df::DataFrame) = begin
     end
 
 
-    fnl_metadata = (
-        names = names(df),
-        rows = size(df, 1),
-        metadatas = pmetadatas
-    )
+    fnl_metadata = (names = names(df), rows = size(df, 1), metadatas = pmetadatas)
 
     serialize(joinpath(outdir, "metadata.jls"), fnl_metadata)
     fnl_metadata
@@ -84,17 +76,11 @@ end
 # figure out from metadata how much space is allocated
 get_bytes_v1(metadata) = begin
     if metadata.type == String
-        return max(
-            metadata.string_compressed_bytes,
-            metadata.string_len_bytes,
-        )
+        return max(metadata.string_compressed_bytes, metadata.string_len_bytes)
     elseif metadata.type == Missing
         return 0
     elseif metadata.type >: Missing
-        return max(
-            get_bytes(metadata.Tmeta),
-            get_bytes(metadata.missingmeta),
-        )
+        return max(get_bytes(metadata.Tmeta), get_bytes(metadata.missingmeta))
     else
         return metadata.len
     end
@@ -122,7 +108,7 @@ compress_then_write_v1(::Type{Bool}, b, io) = begin
 end
 
 column_loader_v1(T::Type{Bool}, io, metadata) = begin
-# Bool are saved as UInt8
+    # Bool are saved as UInt8
     buffer = Vector{UInt8}(undef, metadata.len)
     readbytes!(io, buffer, metadata.len)
     Bool.(Blosc.decompress(UInt8, buffer))
@@ -145,10 +131,10 @@ compress_then_write_v1(::Type{T}, b, io) where {T>:Missing} = begin
     metadata2 = compress_then_write(eltype(b_m), b_m, io)
 
     (
-     Tmeta = metadata,
-     missingmeta = metadata2,
-     type = eltype(b),
-     len = max(metadata.len, metadata2.len),
+        Tmeta = metadata,
+        missingmeta = metadata2,
+        type = eltype(b),
+        len = max(metadata.len, metadata2.len),
     )
 end
 
@@ -171,8 +157,8 @@ compress_then_write_v1(_, b::StringVector{T}, io) where {T} = compress_then_writ
 compress_then_write_v1(b::StringVector{T}, io) where {T} = begin
     fields = (getfield(b, n) for n in fieldnames(typeof(b)))
     (
-     metadata = [(eltype(f), write(io, Blosc.compress(f))) for f in fields],
-     type = typeof(b),
+        metadata = [(eltype(f), write(io, Blosc.compress(f))) for f in fields],
+        type = typeof(b),
     )
 end
 

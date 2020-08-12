@@ -18,8 +18,8 @@ propertynames(jdf::JDFFile) = names(jdf)
 getproperty(jdf::JDFFile, col::Symbol) = jdf[!, col]
 
 schema(jdf::JDFFile) = begin
-     meta  = metadata(jdf)
-     Schema(meta.names, map(x->x.type, meta.metadatas))
+    meta = metadata(jdf)
+    Schema(meta.names, map(x -> x.type, meta.metadatas))
 end
 
 columns(jdf::JDFFile) = jdf
