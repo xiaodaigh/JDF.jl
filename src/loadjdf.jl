@@ -137,3 +137,7 @@ sloadjdf(indir; cols = Symbol[], verbose = false) = begin
 	end
  	df
 end
+
+load(args...; kwargs...) = loadjdf(args...; kwargs...)
+sload(args...; kwargs...) = sloadjdf(args...; kwargs...)
+

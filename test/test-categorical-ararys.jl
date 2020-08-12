@@ -1,6 +1,6 @@
 using Test
 using JDF
-#using RDatasets
+using RDatasets
 using DataFrames: DataFrame
 using CategoricalArrays
 
@@ -19,9 +19,9 @@ using CategoricalArrays
 end
 
 @testset "Guard against Github #27" begin
-    # iris = dataset("datasets", "iris")
-    # savejdf(iris, "iris.jdf")
-    # loadjdf("iris.jdf")
-    #
-    # rm("iris.jdf", force = true, recursive = true)
+    iris = dataset("datasets", "iris")
+    savejdf(iris, "iris.jdf")
+    loadjdf("iris.jdf")
+
+    rm("iris.jdf", force = true, recursive = true)
 end
