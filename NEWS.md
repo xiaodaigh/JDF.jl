@@ -1,3 +1,7 @@
+## 0.2.18
+Added PooledArrays support; fixes #45
+Added `save` and `load` functions
+
 ## 0.2.16
 Updated to DataFrames v0.21
 

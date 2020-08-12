@@ -213,7 +213,7 @@ I believe that restricting the types that JDF supports is vital for simplicity a
 There is support for
 * `WeakRefStrings.StringVector`
 * `Vector{T}`, `Vector{Union{Mising, T}}`, `Vector{Union{Nothing, T}}`
-* `CategoricalArrays.CategoricalVetors{T}`
+* `CategoricalArrays.CategoricalVetors{T}` and `PooledArrays.PooledVector`
 
 where `T` can be `String`, `Bool`, `Symbol`, `Char`, `TimeZones.ZonedDateTime` (experimental) and `isbits` types i.e. `UInt*`, `Int*`,
 and `Float*` `Date*` types etc.

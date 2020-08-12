@@ -34,7 +34,7 @@ function __init__()
     end
 end
 
-export savejdf, loadjdf, ssavejdf, sloadjdf
+export savejdf, loadjdf, ssavejdf, sloadjdf#, save, load
 export column_loader, column_loader!
 export type_compress!, type_compress
 export compress_then_write
@@ -46,6 +46,7 @@ include("JDFFile.jl")
 include("type-writer-loader/Bool.jl")
 include("type-writer-loader/Char.jl")
 include("type-writer-loader/categorical-arrays.jl")
+include("type-writer-loader/pooled-arrays.jl")
 include("type-writer-loader/Missing.jl")
 include("type-writer-loader/Nothing.jl")
 include("type-writer-loader/String.jl")

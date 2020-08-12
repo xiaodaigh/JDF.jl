@@ -139,3 +139,6 @@ get_bytes(metadata) = begin
 end
 
 hasfieldnames(::Type{T}) where {T} = fieldnames(T) >= 1
+
+save(args...; kwargs...) = savejdf(args...; kwargs...)
+ssave(args...; kwargs...) = ssavejdf(args...; kwargs...)
