@@ -24,7 +24,7 @@ size(jdf"plsdel.jdf", 1) # (2, 3)
 # clean up
 rm("plsdel.jdf", force = true, recursive = true)
 """
-struct JDFFile{T <: AbstractString}
+struct JDFFile{T<:AbstractString}
     path::T
 end
 

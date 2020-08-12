@@ -15,7 +15,7 @@ using JDF, DataFrames
     end
 
     aa = open("io.jdf", "r") do io
-        column_loader(Union{Missing, Symbol}, io, metadata)
+        column_loader(Union{Missing,Symbol}, io, metadata)
     end
 
     df = DataFrame(a = a, ac = ac)
@@ -26,6 +26,6 @@ using JDF, DataFrames
     @test all(isequal.(df.a, df2.a))
     @test all(isequal.(df.ac, df2.ac))
 
-    rm("io.jdf", force=true)
-    rm("pls_del.jdf", force=true, recursive=true)
+    rm("io.jdf", force = true)
+    rm("pls_del.jdf", force = true, recursive = true)
 end

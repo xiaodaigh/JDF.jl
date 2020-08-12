@@ -3,7 +3,7 @@
 
 Some arbitrary element of type `T`
 """
-some_elm(::Type{T}) where T = begin
+some_elm(::Type{T}) where {T} = begin
     try
         return zero(T)
     catch
@@ -57,7 +57,7 @@ savejdf(outdir, df::AbstractDataFrame; verbose = false) = begin
 
     # use a bounded channel to limit
     c1 = Channel{Bool}(Threads.nthreads())
-    atexit(()->close(c1))
+    atexit(() -> close(c1))
 
     for (i, n) in enumerate(DataFrames.names(df))
         if verbose
@@ -65,7 +65,7 @@ savejdf(outdir, df::AbstractDataFrame; verbose = false) = begin
         end
         put!(c1, true)
         pmetadatas[i] = @spawn begin
-            io = BufferedOutputStream(open(joinpath(outdir, string(n)) ,"w"))
+            io = BufferedOutputStream(open(joinpath(outdir, string(n)), "w"))
             res = compress_then_write(df[!, i], io)
             close(io)
             res
@@ -79,7 +79,7 @@ savejdf(outdir, df::AbstractDataFrame; verbose = false) = begin
         names = DataFrames.names(df),
         rows = DataFrames.size(df, 1),
         metadatas = metadatas,
-        version = v"0.2"
+        version = v"0.2",
     )
 
     open(joinpath(outdir, "metadata.jls"), "w") do io
@@ -110,7 +110,7 @@ ssavejdf(outdir, df::AbstractDataFrame) = begin
         names = DataFrames.names(df),
         rows = DataFrames.size(df, 1),
         metadatas = pmetadatas,
-        version = v"0.2"
+        version = v"0.2",
     )
 
     open(joinpath(outdir, "metadata.jls"), "w") do io
@@ -122,17 +122,11 @@ end
 # figure out from metadata how much space is allocated
 get_bytes(metadata) = begin
     if metadata.type == String
-        return max(
-            metadata.string_compressed_bytes,
-            metadata.string_len_bytes,
-        )
+        return max(metadata.string_compressed_bytes, metadata.string_len_bytes)
     elseif metadata.type == Missing
         return 0
     elseif metadata.type >: Missing
-        return max(
-            get_bytes(metadata.Tmeta),
-            get_bytes(metadata.missingmeta),
-        )
+        return max(get_bytes(metadata.Tmeta), get_bytes(metadata.missingmeta))
     else
         return metadata.len
     end

@@ -10,4 +10,4 @@ propertynames(ok)
 getproperty(ok, :Species)
 
 
-rm("plsdel.jdf", force=true, recursive=true)
+rm("plsdel.jdf", force = true, recursive = true)

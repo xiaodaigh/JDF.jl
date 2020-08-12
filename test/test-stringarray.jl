@@ -16,8 +16,8 @@ using JDF, WeakRefStrings, DataFrames
     savejdf("pls_del.jdf", df)
     df2 = loadjdf("pls_del.jdf")
 
-    
 
-    rm("io.jdf", force=true)
-    rm("pls_del.jdf", force=true, recursive=true)
+
+    rm("io.jdf", force = true)
+    rm("pls_del.jdf", force = true, recursive = true)
 end
