@@ -10,3 +10,5 @@ iris.jdf
 *.csv
 julia-formatter/Manifest.toml
 julia-formatter/Project.toml
+
+readme-build

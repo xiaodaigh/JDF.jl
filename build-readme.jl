@@ -1,14 +1,13 @@
 # Weave readme
 using Pkg
-cd("c:/git/JDF")
-Pkg.activate("c:/git/JDF")
-Pkg.add("Weave")
-Pkg.add("RDatasets")
-Pkg.update()
+cd("c:/git/JDF/readme-build")
+Pkg.activate("c:/git/JDF/readme-build")
+
 using Weave
 
-weave("README.jmd", out_path=:pwd, doctype="github")
+weave("../README.jmd", out_path="c:/git/JDF/", doctype="github")
 
-tangle("README.jmd")
-Pkg.rm("Weave")
-Pkg.rm("RDatasets")
+if false
+    # debug
+    tangle("../README.jmd")
+end

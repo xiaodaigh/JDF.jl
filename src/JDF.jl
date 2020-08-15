@@ -53,6 +53,7 @@ include("type-writer-loader/String.jl")
 include("type-writer-loader/StringArray.jl")
 include("type-writer-loader/Symbol.jl")
 include("type-writer-loader/ZonedDateTime.jl")
+include("type-writer-loader/substring.jl")
 
 include("column_loader.jl")
 include("compress_then_write.jl")
