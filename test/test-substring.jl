@@ -15,5 +15,5 @@ df2 = JDF.load("tmp-substring.jdf")
 
 @test df.substrs == df2.substrs
 
-
+rm("tmp-substring.jdf", force=true, recursive=true)
 
