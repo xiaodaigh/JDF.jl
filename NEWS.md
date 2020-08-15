@@ -1,3 +1,6 @@
+## 0.2.19
+Added support for `SubString{String}`
+
 ## 0.2.18
 Added PooledArrays support; fixes #45
 Added `save` and `load` functions
