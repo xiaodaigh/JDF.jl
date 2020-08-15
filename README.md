@@ -57,7 +57,7 @@ Julia 1.3. For Julia < 1.3, it saves and loads using one thread only.
 
 
 ````
-0.003754 seconds (393 allocations: 670.719 KiB)
+0.011556 seconds (420 allocations: 672.531 KiB)
 ````
 
 
@@ -68,7 +68,7 @@ Julia 1.3. For Julia < 1.3, it saves and loads using one thread only.
 
 
 ````
-0.000582 seconds (595 allocations: 686.938 KiB)
+0.002517 seconds (596 allocations: 686.969 KiB)
 150×5 DataFrame
 │ Row │ SepalLength │ SepalWidth │ PetalLength │ PetalWidth │ Species   │
 │     │ Float64     │ Float64    │ Float64     │ Float64    │ Cat…      │
@@ -371,7 +371,7 @@ serially, i.e. without using parallel processes.
 
 
 ````
-0.003555 seconds (423 allocations: 669.984 KiB)
+0.003624 seconds (423 allocations: 669.984 KiB)
 ````
 
 
@@ -382,7 +382,7 @@ serially, i.e. without using parallel processes.
 
 
 ````
-0.000702 seconds (545 allocations: 681.672 KiB)
+0.000776 seconds (545 allocations: 681.672 KiB)
 150×5 DataFrame
 │ Row │ SepalLength │ SepalWidth │ PetalLength │ PetalWidth │ Species   │
 │     │ Float64     │ Float64    │ Float64     │ Float64    │ Cat…      │
@@ -488,7 +488,7 @@ There is support for
 * `Vector{T}`, `Vector{Union{Mising, T}}`, `Vector{Union{Nothing, T}}`
 * `CategoricalArrays.CategoricalVetors{T}` and `PooledArrays.PooledVector`
 
-where `T` can be `String`, `Bool`, `Symbol`, `Char`, `TimeZones.ZonedDateTime` (experimental) and `isbits` types i.e. `UInt*`, `Int*`,
+where `T` can be `String`, `Bool`, `Symbol`, `Char`, `SubString{String}`, `TimeZones.ZonedDateTime` (experimental) and `isbits` types i.e. `UInt*`, `Int*`,
 and `Float*` `Date*` types etc.
 
 `RLEVectors` support will be considered in the future when `missing` support
