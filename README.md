@@ -13,7 +13,7 @@ There is also a `metadata.jls` file that stores metadata about the original
 `DataFrame`. Collectively, the column files, the metadata file, and the folder
 is called a JDF "file".
 
-`JDF.jl` is Julia-only solution and there are a lot of ways to do nifty things
+`JDF.jl` is a pure-Julia solution and there are a lot of ways to do nifty things
 like compression and encapsulating the underlying struture of the arrays that's
 hard to do in R and Python. E.g. Python's numpy arrays are C objects, but all
 the vector types used in JDF are Julia data types.
@@ -36,16 +36,11 @@ first(a, 2)
 
 ````
 2×5 DataFrame
-│ Row │ SepalLength │ SepalWidth │ PetalLength │ PetalWidth │ Species      
-│
-│     │ Float64     │ Float64    │ Float64     │ Float64    │ Categorical… 
-│
-├─────┼─────────────┼────────────┼─────────────┼────────────┼──────────────
-┤
-│ 1   │ 5.1         │ 3.5        │ 1.4         │ 0.2        │ setosa       
-│
-│ 2   │ 4.9         │ 3.0        │ 1.4         │ 0.2        │ setosa       
-│
+│ Row │ SepalLength │ SepalWidth │ PetalLength │ PetalWidth │ Species │
+│     │ Float64     │ Float64    │ Float64     │ Float64    │ Cat…    │
+├─────┼─────────────┼────────────┼─────────────┼────────────┼─────────┤
+│ 1   │ 5.1         │ 3.5        │ 1.4         │ 0.2        │ setosa  │
+│ 2   │ 4.9         │ 3.0        │ 1.4         │ 0.2        │ setosa  │
 ````
 
 
@@ -62,7 +57,7 @@ Julia 1.3. For Julia < 1.3, it saves and loads using one thread only.
 
 
 ````
-0.004860 seconds (354 allocations: 668.750 KiB)
+0.003754 seconds (393 allocations: 670.719 KiB)
 ````
 
 
@@ -73,45 +68,27 @@ Julia 1.3. For Julia < 1.3, it saves and loads using one thread only.
 
 
 ````
-0.000784 seconds (680 allocations: 691.328 KiB)
+0.000582 seconds (595 allocations: 686.938 KiB)
 150×5 DataFrame
-│ Row │ SepalLength │ SepalWidth │ PetalLength │ PetalWidth │ Species      
-│
-│     │ Float64     │ Float64    │ Float64     │ Float64    │ Categorical… 
-│
-├─────┼─────────────┼────────────┼─────────────┼────────────┼──────────────
-┤
-│ 1   │ 5.1         │ 3.5        │ 1.4         │ 0.2        │ setosa       
-│
-│ 2   │ 4.9         │ 3.0        │ 1.4         │ 0.2        │ setosa       
-│
-│ 3   │ 4.7         │ 3.2        │ 1.3         │ 0.2        │ setosa       
-│
-│ 4   │ 4.6         │ 3.1        │ 1.5         │ 0.2        │ setosa       
-│
-│ 5   │ 5.0         │ 3.6        │ 1.4         │ 0.2        │ setosa       
-│
-│ 6   │ 5.4         │ 3.9        │ 1.7         │ 0.4        │ setosa       
-│
-│ 7   │ 4.6         │ 3.4        │ 1.4         │ 0.3        │ setosa       
-│
+│ Row │ SepalLength │ SepalWidth │ PetalLength │ PetalWidth │ Species   │
+│     │ Float64     │ Float64    │ Float64     │ Float64    │ Cat…      │
+├─────┼─────────────┼────────────┼─────────────┼────────────┼───────────┤
+│ 1   │ 5.1         │ 3.5        │ 1.4         │ 0.2        │ setosa    │
+│ 2   │ 4.9         │ 3.0        │ 1.4         │ 0.2        │ setosa    │
+│ 3   │ 4.7         │ 3.2        │ 1.3         │ 0.2        │ setosa    │
+│ 4   │ 4.6         │ 3.1        │ 1.5         │ 0.2        │ setosa    │
+│ 5   │ 5.0         │ 3.6        │ 1.4         │ 0.2        │ setosa    │
+│ 6   │ 5.4         │ 3.9        │ 1.7         │ 0.4        │ setosa    │
+│ 7   │ 4.6         │ 3.4        │ 1.4         │ 0.3        │ setosa    │
 ⋮
-│ 143 │ 5.8         │ 2.7        │ 5.1         │ 1.9        │ virginica    
-│
-│ 144 │ 6.8         │ 3.2        │ 5.9         │ 2.3        │ virginica    
-│
-│ 145 │ 6.7         │ 3.3        │ 5.7         │ 2.5        │ virginica    
-│
-│ 146 │ 6.7         │ 3.0        │ 5.2         │ 2.3        │ virginica    
-│
-│ 147 │ 6.3         │ 2.5        │ 5.0         │ 1.9        │ virginica    
-│
-│ 148 │ 6.5         │ 3.0        │ 5.2         │ 2.0        │ virginica    
-│
-│ 149 │ 6.2         │ 3.4        │ 5.4         │ 2.3        │ virginica    
-│
-│ 150 │ 5.9         │ 3.0        │ 5.1         │ 1.8        │ virginica    
-│
+│ 143 │ 5.8         │ 2.7        │ 5.1         │ 1.9        │ virginica │
+│ 144 │ 6.8         │ 3.2        │ 5.9         │ 2.3        │ virginica │
+│ 145 │ 6.7         │ 3.3        │ 5.7         │ 2.5        │ virginica │
+│ 146 │ 6.7         │ 3.0        │ 5.2         │ 2.3        │ virginica │
+│ 147 │ 6.3         │ 2.5        │ 5.0         │ 1.9        │ virginica │
+│ 148 │ 6.5         │ 3.0        │ 5.2         │ 2.0        │ virginica │
+│ 149 │ 6.2         │ 3.4        │ 5.4         │ 2.3        │ virginica │
+│ 150 │ 5.9         │ 3.0        │ 5.1         │ 1.8        │ virginica │
 ````
 
 
@@ -143,25 +120,25 @@ a2_selected = loadjdf("iris.jdf", cols = [:Species, :SepalLength, :PetalWidth])
 
 ````
 150×3 DataFrame
-│ Row │ SepalLength │ PetalWidth │ Species      │
-│     │ Float64     │ Float64    │ Categorical… │
-├─────┼─────────────┼────────────┼──────────────┤
-│ 1   │ 5.1         │ 0.2        │ setosa       │
-│ 2   │ 4.9         │ 0.2        │ setosa       │
-│ 3   │ 4.7         │ 0.2        │ setosa       │
-│ 4   │ 4.6         │ 0.2        │ setosa       │
-│ 5   │ 5.0         │ 0.2        │ setosa       │
-│ 6   │ 5.4         │ 0.4        │ setosa       │
-│ 7   │ 4.6         │ 0.3        │ setosa       │
+│ Row │ SepalLength │ PetalWidth │ Species   │
+│     │ Float64     │ Float64    │ Cat…      │
+├─────┼─────────────┼────────────┼───────────┤
+│ 1   │ 5.1         │ 0.2        │ setosa    │
+│ 2   │ 4.9         │ 0.2        │ setosa    │
+│ 3   │ 4.7         │ 0.2        │ setosa    │
+│ 4   │ 4.6         │ 0.2        │ setosa    │
+│ 5   │ 5.0         │ 0.2        │ setosa    │
+│ 6   │ 5.4         │ 0.4        │ setosa    │
+│ 7   │ 4.6         │ 0.3        │ setosa    │
 ⋮
-│ 143 │ 5.8         │ 1.9        │ virginica    │
-│ 144 │ 6.8         │ 2.3        │ virginica    │
-│ 145 │ 6.7         │ 2.5        │ virginica    │
-│ 146 │ 6.7         │ 2.3        │ virginica    │
-│ 147 │ 6.3         │ 1.9        │ virginica    │
-│ 148 │ 6.5         │ 2.0        │ virginica    │
-│ 149 │ 6.2         │ 2.3        │ virginica    │
-│ 150 │ 5.9         │ 1.8        │ virginica    │
+│ 143 │ 5.8         │ 1.9        │ virginica │
+│ 144 │ 6.8         │ 2.3        │ virginica │
+│ 145 │ 6.7         │ 2.5        │ virginica │
+│ 146 │ 6.7         │ 2.3        │ virginica │
+│ 147 │ 6.3         │ 1.9        │ virginica │
+│ 148 │ 6.5         │ 2.0        │ virginica │
+│ 149 │ 6.2         │ 2.3        │ virginica │
+│ 150 │ 5.9         │ 1.8        │ virginica │
 ````
 
 
@@ -219,25 +196,25 @@ afile[:, [:Species, :PetalLength]] # load Species and PetalLength column
 
 ````
 150×2 DataFrame
-│ Row │ Species      │ PetalLength │
-│     │ Categorical… │ Float64     │
-├─────┼──────────────┼─────────────┤
-│ 1   │ setosa       │ 1.4         │
-│ 2   │ setosa       │ 1.4         │
-│ 3   │ setosa       │ 1.3         │
-│ 4   │ setosa       │ 1.5         │
-│ 5   │ setosa       │ 1.4         │
-│ 6   │ setosa       │ 1.7         │
-│ 7   │ setosa       │ 1.4         │
+│ Row │ Species   │ PetalLength │
+│     │ Cat…      │ Float64     │
+├─────┼───────────┼─────────────┤
+│ 1   │ setosa    │ 1.4         │
+│ 2   │ setosa    │ 1.4         │
+│ 3   │ setosa    │ 1.3         │
+│ 4   │ setosa    │ 1.5         │
+│ 5   │ setosa    │ 1.4         │
+│ 6   │ setosa    │ 1.7         │
+│ 7   │ setosa    │ 1.4         │
 ⋮
-│ 143 │ virginica    │ 5.1         │
-│ 144 │ virginica    │ 5.9         │
-│ 145 │ virginica    │ 5.7         │
-│ 146 │ virginica    │ 5.2         │
-│ 147 │ virginica    │ 5.0         │
-│ 148 │ virginica    │ 5.2         │
-│ 149 │ virginica    │ 5.4         │
-│ 150 │ virginica    │ 5.1         │
+│ 143 │ virginica │ 5.1         │
+│ 144 │ virginica │ 5.9         │
+│ 145 │ virginica │ 5.7         │
+│ 146 │ virginica │ 5.2         │
+│ 147 │ virginica │ 5.0         │
+│ 148 │ virginica │ 5.2         │
+│ 149 │ virginica │ 5.4         │
+│ 150 │ virginica │ 5.1         │
 ````
 
 
@@ -394,7 +371,7 @@ serially, i.e. without using parallel processes.
 
 
 ````
-0.003437 seconds (290 allocations: 663.203 KiB)
+0.003555 seconds (423 allocations: 669.984 KiB)
 ````
 
 
@@ -405,45 +382,27 @@ serially, i.e. without using parallel processes.
 
 
 ````
-0.000981 seconds (592 allocations: 683.828 KiB)
+0.000702 seconds (545 allocations: 681.672 KiB)
 150×5 DataFrame
-│ Row │ SepalLength │ SepalWidth │ PetalLength │ PetalWidth │ Species      
-│
-│     │ Float64     │ Float64    │ Float64     │ Float64    │ Categorical… 
-│
-├─────┼─────────────┼────────────┼─────────────┼────────────┼──────────────
-┤
-│ 1   │ 5.1         │ 3.5        │ 1.4         │ 0.2        │ setosa       
-│
-│ 2   │ 4.9         │ 3.0        │ 1.4         │ 0.2        │ setosa       
-│
-│ 3   │ 4.7         │ 3.2        │ 1.3         │ 0.2        │ setosa       
-│
-│ 4   │ 4.6         │ 3.1        │ 1.5         │ 0.2        │ setosa       
-│
-│ 5   │ 5.0         │ 3.6        │ 1.4         │ 0.2        │ setosa       
-│
-│ 6   │ 5.4         │ 3.9        │ 1.7         │ 0.4        │ setosa       
-│
-│ 7   │ 4.6         │ 3.4        │ 1.4         │ 0.3        │ setosa       
-│
+│ Row │ SepalLength │ SepalWidth │ PetalLength │ PetalWidth │ Species   │
+│     │ Float64     │ Float64    │ Float64     │ Float64    │ Cat…      │
+├─────┼─────────────┼────────────┼─────────────┼────────────┼───────────┤
+│ 1   │ 5.1         │ 3.5        │ 1.4         │ 0.2        │ setosa    │
+│ 2   │ 4.9         │ 3.0        │ 1.4         │ 0.2        │ setosa    │
+│ 3   │ 4.7         │ 3.2        │ 1.3         │ 0.2        │ setosa    │
+│ 4   │ 4.6         │ 3.1        │ 1.5         │ 0.2        │ setosa    │
+│ 5   │ 5.0         │ 3.6        │ 1.4         │ 0.2        │ setosa    │
+│ 6   │ 5.4         │ 3.9        │ 1.7         │ 0.4        │ setosa    │
+│ 7   │ 4.6         │ 3.4        │ 1.4         │ 0.3        │ setosa    │
 ⋮
-│ 143 │ 5.8         │ 2.7        │ 5.1         │ 1.9        │ virginica    
-│
-│ 144 │ 6.8         │ 3.2        │ 5.9         │ 2.3        │ virginica    
-│
-│ 145 │ 6.7         │ 3.3        │ 5.7         │ 2.5        │ virginica    
-│
-│ 146 │ 6.7         │ 3.0        │ 5.2         │ 2.3        │ virginica    
-│
-│ 147 │ 6.3         │ 2.5        │ 5.0         │ 1.9        │ virginica    
-│
-│ 148 │ 6.5         │ 3.0        │ 5.2         │ 2.0        │ virginica    
-│
-│ 149 │ 6.2         │ 3.4        │ 5.4         │ 2.3        │ virginica    
-│
-│ 150 │ 5.9         │ 3.0        │ 5.1         │ 1.8        │ virginica    
-│
+│ 143 │ 5.8         │ 2.7        │ 5.1         │ 1.9        │ virginica │
+│ 144 │ 6.8         │ 3.2        │ 5.9         │ 2.3        │ virginica │
+│ 145 │ 6.7         │ 3.3        │ 5.7         │ 2.5        │ virginica │
+│ 146 │ 6.7         │ 3.0        │ 5.2         │ 2.3        │ virginica │
+│ 147 │ 6.3         │ 2.5        │ 5.0         │ 1.9        │ virginica │
+│ 148 │ 6.5         │ 3.0        │ 5.2         │ 2.0        │ virginica │
+│ 149 │ 6.2         │ 3.4        │ 5.4         │ 2.3        │ virginica │
+│ 150 │ 5.9         │ 3.0        │ 5.1         │ 1.8        │ virginica │
 ````
 
 
@@ -527,7 +486,7 @@ I believe that restricting the types that JDF supports is vital for simplicity a
 There is support for
 * `WeakRefStrings.StringVector`
 * `Vector{T}`, `Vector{Union{Mising, T}}`, `Vector{Union{Nothing, T}}`
-* `CategoricalArrays.CategoricalVetors{T}`
+* `CategoricalArrays.CategoricalVetors{T}` and `PooledArrays.PooledVector`
 
 where `T` can be `String`, `Bool`, `Symbol`, `Char`, `TimeZones.ZonedDateTime` (experimental) and `isbits` types i.e. `UInt*`, `Int*`,
 and `Float*` `Date*` types etc.
@@ -554,4 +513,4 @@ I fully intend to develop JDF.jl into a language neutral format by version v0.4.
 ## Notes
 
 * Parallel read and write support is only available from Julia 1.3.
-* The design of JDF was inspired by [fst](fstpackage.org) in terms of using compressions and allowing random-access to columns
+* The design of JDF was inspired by [fst](https://www.fstpackage.org/) in terms of using compressions and allowing random-access to columns
