@@ -9,7 +9,7 @@ using CategoricalArrays
     df[!, :x1] = categorical(df[!, :x1])
     df[!, :x2] = categorical(string.(df[!, :x2]))
     savejdf(df, "a3cate.jdf")
-    df2 = loadjdf("a3cate.jdf", cols = [:x2, :x1])
+    df2 = JDF.load("a3cate.jdf", cols = [:x2, :x1])
     @test size(df2, 2) == 2
     @test size(df2, 1) == 100
     @time df2[!, :x1] isa CategoricalVector{Int}
@@ -20,8 +20,8 @@ end
 
 @testset "Guard against Github #27" begin
     iris = dataset("datasets", "iris")
-    savejdf(iris, "iris.jdf")
-    loadjdf("iris.jdf")
+    JDF.save(iris, "iris.jdf")
+    JDF.load("iris.jdf")
 
     rm("iris.jdf", force = true, recursive = true)
 end

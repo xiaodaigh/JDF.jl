@@ -1,5 +1,7 @@
 using DataAPI
 
+using CategoricalArrays: CategoricalVector, CategoricalArray, CategoricalPool
+
 compress_then_write(b::CategoricalVector{T,IntType}, io) where {T,IntType<:Integer} = begin
     #println("abc")
     compress_refs = compress_then_write(b.refs, io)

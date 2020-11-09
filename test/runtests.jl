@@ -30,7 +30,10 @@ include("test-substring.jl")
     df[!, :char_missing] = allowmissing(df[!, :char])
     df[rand(1:nrow(df), 10), :char_missing] .= missing
 
-    savejdf("a.jdf", df)
+    @time JDF.save("a.jdf", df)
+    @time df2 = JDF.load("a.jdf")
+
+    isequal(df, df2)
 
     df2 = loadjdf("a.jdf")
     @test ncol(df2) == 3009
