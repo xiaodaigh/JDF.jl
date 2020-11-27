@@ -25,23 +25,22 @@ The next version of JDF which is v0.3 will contain breaking changes. But don't w
 
 ## Example: Quick Start
 
-````julia
+```julia
 using RDatasets, JDF, DataFrames
 
 a = dataset("datasets", "iris");
 
 first(a, 2)
-````
+```
 
-
-````
+```
 2×5 DataFrame
-│ Row │ SepalLength │ SepalWidth │ PetalLength │ PetalWidth │ Species │
-│     │ Float64     │ Float64    │ Float64     │ Float64    │ Cat…    │
-├─────┼─────────────┼────────────┼─────────────┼────────────┼─────────┤
-│ 1   │ 5.1         │ 3.5        │ 1.4         │ 0.2        │ setosa  │
-│ 2   │ 4.9         │ 3.0        │ 1.4         │ 0.2        │ setosa  │
-````
+ Row │ SepalLength  SepalWidth  PetalLength  PetalWidth  Species
+     │ Float64      Float64     Float64      Float64     Cat…
+─────┼───────────────────────────────────────────────────────────
+   1 │         5.1         3.5          1.4         0.2  setosa
+   2 │         4.9         3.0          1.4         0.2  setosa
+```
 
 
 
@@ -51,60 +50,50 @@ first(a, 2)
 By default JDF loads and saves `DataFrame`s using multiple threads starting from
 Julia 1.3. For Julia < 1.3, it saves and loads using one thread only.
 
-````julia
-@time jdffile = savejdf("iris.jdf", a)
-````
+```julia
+@time jdffile = JDF.save("iris.jdf", a)
+@time a2 = DataFrame(JDF.load("iris.jdf"))
+```
 
-
-````
-0.011556 seconds (420 allocations: 672.531 KiB)
-````
-
-
-
-````julia
-@time a2 = loadjdf("iris.jdf")
-````
-
-
-````
-0.002517 seconds (596 allocations: 686.969 KiB)
+```
+0.094318 seconds (151.78 k allocations: 8.323 MiB, 14.57% gc time)
+  0.352393 seconds (1.16 M allocations: 60.137 MiB, 3.82% gc time)
 150×5 DataFrame
-│ Row │ SepalLength │ SepalWidth │ PetalLength │ PetalWidth │ Species   │
-│     │ Float64     │ Float64    │ Float64     │ Float64    │ Cat…      │
-├─────┼─────────────┼────────────┼─────────────┼────────────┼───────────┤
-│ 1   │ 5.1         │ 3.5        │ 1.4         │ 0.2        │ setosa    │
-│ 2   │ 4.9         │ 3.0        │ 1.4         │ 0.2        │ setosa    │
-│ 3   │ 4.7         │ 3.2        │ 1.3         │ 0.2        │ setosa    │
-│ 4   │ 4.6         │ 3.1        │ 1.5         │ 0.2        │ setosa    │
-│ 5   │ 5.0         │ 3.6        │ 1.4         │ 0.2        │ setosa    │
-│ 6   │ 5.4         │ 3.9        │ 1.7         │ 0.4        │ setosa    │
-│ 7   │ 4.6         │ 3.4        │ 1.4         │ 0.3        │ setosa    │
-⋮
-│ 143 │ 5.8         │ 2.7        │ 5.1         │ 1.9        │ virginica │
-│ 144 │ 6.8         │ 3.2        │ 5.9         │ 2.3        │ virginica │
-│ 145 │ 6.7         │ 3.3        │ 5.7         │ 2.5        │ virginica │
-│ 146 │ 6.7         │ 3.0        │ 5.2         │ 2.3        │ virginica │
-│ 147 │ 6.3         │ 2.5        │ 5.0         │ 1.9        │ virginica │
-│ 148 │ 6.5         │ 3.0        │ 5.2         │ 2.0        │ virginica │
-│ 149 │ 6.2         │ 3.4        │ 5.4         │ 2.3        │ virginica │
-│ 150 │ 5.9         │ 3.0        │ 5.1         │ 1.8        │ virginica │
-````
+ Row │ SepalLength  SepalWidth  PetalLength  PetalWidth  Species
+     │ Float64      Float64     Float64      Float64     Cat…
+─────┼─────────────────────────────────────────────────────────────
+   1 │         5.1         3.5          1.4         0.2  setosa
+   2 │         4.9         3.0          1.4         0.2  setosa
+   3 │         4.7         3.2          1.3         0.2  setosa
+   4 │         4.6         3.1          1.5         0.2  setosa
+   5 │         5.0         3.6          1.4         0.2  setosa
+   6 │         5.4         3.9          1.7         0.4  setosa
+   7 │         4.6         3.4          1.4         0.3  setosa
+   8 │         5.0         3.4          1.5         0.2  setosa
+  ⋮  │      ⋮           ⋮            ⋮           ⋮           ⋮
+ 144 │         6.8         3.2          5.9         2.3  virginica
+ 145 │         6.7         3.3          5.7         2.5  virginica
+ 146 │         6.7         3.0          5.2         2.3  virginica
+ 147 │         6.3         2.5          5.0         1.9  virginica
+ 148 │         6.5         3.0          5.2         2.0  virginica
+ 149 │         6.2         3.4          5.4         2.3  virginica
+ 150 │         5.9         3.0          5.1         1.8  virginica
+                                                   135 rows omitted
+```
 
 
 
 
 
 Simple checks for correctness
-````julia
+```julia
 all(names(a2) .== names(a)) # true
 all(skipmissing([all(a2[!,name] .== Array(a[!,name])) for name in names(a2)])) #true
-````
+```
 
-
-````
+```
 true
-````
+```
 
 
 
@@ -113,33 +102,33 @@ true
 ### Loading only certain columns
 You can load only a few columns from the dataset by specifying `cols =
 [:column1, :column2]`. For example
-````julia
-a2_selected = loadjdf("iris.jdf", cols = [:Species, :SepalLength, :PetalWidth])
-````
+```julia
+a2_selected = DataFrame(JDF.load("iris.jdf", cols = [:Species, :SepalLength, :PetalWidth]))
+```
 
-
-````
+```
 150×3 DataFrame
-│ Row │ SepalLength │ PetalWidth │ Species   │
-│     │ Float64     │ Float64    │ Cat…      │
-├─────┼─────────────┼────────────┼───────────┤
-│ 1   │ 5.1         │ 0.2        │ setosa    │
-│ 2   │ 4.9         │ 0.2        │ setosa    │
-│ 3   │ 4.7         │ 0.2        │ setosa    │
-│ 4   │ 4.6         │ 0.2        │ setosa    │
-│ 5   │ 5.0         │ 0.2        │ setosa    │
-│ 6   │ 5.4         │ 0.4        │ setosa    │
-│ 7   │ 4.6         │ 0.3        │ setosa    │
-⋮
-│ 143 │ 5.8         │ 1.9        │ virginica │
-│ 144 │ 6.8         │ 2.3        │ virginica │
-│ 145 │ 6.7         │ 2.5        │ virginica │
-│ 146 │ 6.7         │ 2.3        │ virginica │
-│ 147 │ 6.3         │ 1.9        │ virginica │
-│ 148 │ 6.5         │ 2.0        │ virginica │
-│ 149 │ 6.2         │ 2.3        │ virginica │
-│ 150 │ 5.9         │ 1.8        │ virginica │
-````
+ Row │ SepalLength  PetalWidth  Species
+     │ Float64      Float64     Cat…
+─────┼────────────────────────────────────
+   1 │         5.1         0.2  setosa
+   2 │         4.9         0.2  setosa
+   3 │         4.7         0.2  setosa
+   4 │         4.6         0.2  setosa
+   5 │         5.0         0.2  setosa
+   6 │         5.4         0.4  setosa
+   7 │         4.6         0.3  setosa
+   8 │         5.0         0.2  setosa
+  ⋮  │      ⋮           ⋮           ⋮
+ 144 │         6.8         2.3  virginica
+ 145 │         6.7         2.5  virginica
+ 146 │         6.7         2.3  virginica
+ 147 │         6.3         1.9  virginica
+ 148 │         6.5         2.0  virginica
+ 149 │         6.2         2.3  virginica
+ 150 │         5.9         1.8  virginica
+                          135 rows omitted
+```
 
 
 
@@ -150,28 +139,26 @@ is that it saves time as only the selected columns are loaded from disk.
 ### Some `DataFrame`-like convenience syntax/functions
 To take advatnage of some these convenience functions, you need to create a variable of type `JDFFile` pointed to the JDF file on disk. For example
 
-````julia
+```julia
 jdf"path/to/JDF.jdf"
-````
+```
 
-
-````
+```
 JDFFile{String}("path/to/JDF.jdf")
-````
+```
 
 
 
 
 or
-````julia
+```julia
 path_to_JDF = "path/to/JDF.jdf"
 JDFFile(path_to_JDF)
-````
+```
 
-
-````
+```
 JDFFile{String}("path/to/JDF.jdf")
-````
+```
 
 
 
@@ -180,7 +167,7 @@ JDFFile{String}("path/to/JDF.jdf")
 #### Using `df[rows, cols]` syntax
 You can load arbitrary `rows` and `cols` using the `df[rows, cols]` syntax. However, some of these operations are not yet optimized and hence may not be efficient.
 
-````julia
+```julia
 afile = JDFFile("iris.jdf")
 
 afile[!, :Species] # load Species column
@@ -191,31 +178,31 @@ afile[:, [:Species, :PetalLength]] # load Species and PetalLength column
 
 @view(afile[!, :Species]) # load Species column
 @view(afile[!, [:Species, :PetalLength]]) # load Species and PetalLength column
-````
+```
 
-
-````
+```
 150×2 DataFrame
-│ Row │ Species   │ PetalLength │
-│     │ Cat…      │ Float64     │
-├─────┼───────────┼─────────────┤
-│ 1   │ setosa    │ 1.4         │
-│ 2   │ setosa    │ 1.4         │
-│ 3   │ setosa    │ 1.3         │
-│ 4   │ setosa    │ 1.5         │
-│ 5   │ setosa    │ 1.4         │
-│ 6   │ setosa    │ 1.7         │
-│ 7   │ setosa    │ 1.4         │
-⋮
-│ 143 │ virginica │ 5.1         │
-│ 144 │ virginica │ 5.9         │
-│ 145 │ virginica │ 5.7         │
-│ 146 │ virginica │ 5.2         │
-│ 147 │ virginica │ 5.0         │
-│ 148 │ virginica │ 5.2         │
-│ 149 │ virginica │ 5.4         │
-│ 150 │ virginica │ 5.1         │
-````
+ Row │ Species    PetalLength
+     │ Cat…       Float64
+─────┼────────────────────────
+   1 │ setosa             1.4
+   2 │ setosa             1.4
+   3 │ setosa             1.3
+   4 │ setosa             1.5
+   5 │ setosa             1.4
+   6 │ setosa             1.7
+   7 │ setosa             1.4
+   8 │ setosa             1.5
+  ⋮  │     ⋮           ⋮
+ 144 │ virginica          5.9
+ 145 │ virginica          5.7
+ 146 │ virginica          5.2
+ 147 │ virginica          5.0
+ 148 │ virginica          5.2
+ 149 │ virginica          5.4
+ 150 │ virginica          5.1
+              135 rows omitted
+```
 
 
 
@@ -227,54 +214,50 @@ This was developed to make it possible for [JLBoost.jl](https://github.com/xiaod
 
 #### JDFFile is Table.jl columm-accessible
 
-````julia
+```julia
 using Tables
 ajdf = JDFFile("iris.jdf")
 Tables.columnaccess(ajdf)
-````
+```
 
-
-````
+```
 true
-````
+```
 
 
 
-````julia
+```julia
 Tables.columns(ajdf)
-````
+```
 
-
-````
+```
 JDFFile{String}("iris.jdf")
-````
+```
 
 
 
-````julia
+```julia
 Tables.schema(ajdf)
-````
+```
 
-
-````
+```
 Tables.Schema:
  :SepalLength  …  Float64
  :SepalWidth      Float64
  :PetalLength     Float64
  :PetalWidth      Float64
- :Species         CategoricalArray{T,1,V,C,U,U1} where U1 where U where C w
-here V where T
-````
+ :Species         CategoricalArrays.CategoricalArray{T,1,R,V,C,U} where U w
+here C where V where R<:Integer where T
+```
 
 
 
-````julia
+```julia
 getproperty(Tables.columns(ajdf), :Species)
-````
+```
 
-
-````
-150-element CategoricalArray{String,1,UInt8}:
+```
+150-element CategoricalArrays.CategoricalArray{String,1,UInt8}:
  "setosa"
  "setosa"
  "setosa"
@@ -295,7 +278,7 @@ getproperty(Tables.columns(ajdf), :Species)
  "virginica"
  "virginica"
  "virginica"
-````
+```
 
 
 
@@ -305,28 +288,26 @@ getproperty(Tables.columns(ajdf), :Species)
 #### Load each column from disk
 You can load each column of a JDF file from disk using iterations
 
-````julia
+```julia
 jdffile = jdf"iris.jdf"
 for col in eachcol(jdffile)
   # do something to col
   # where `col` is the content of one column of iris.jdf
 end
-````
-
+```
 
 
 
 
 To iterate through the columns names and the `col`
 
-````julia
+```julia
 jdffile = jdf"iris.jdf"
 for (name, col) in zip(names(jdffile), eachcol(jdffile))
   # `name::Symbol` is the name of the column
   #  `col` is the content of one column of iris.jdf
 end
-````
-
+```
 
 
 
@@ -336,7 +317,7 @@ You can obtain the column names and size (`nrow` and `ncol`) of a JDF, for
 example:
 
 
-````julia
+```julia
 using JDF, DataFrames
 df = DataFrame(a = 1:3, b = 1:3)
 savejdf(df, "plsdel.jdf")
@@ -356,8 +337,7 @@ size(jdf"plsdel.jdf", 2) # 3
 
 # clean up
 rm("plsdel.jdf", force = true, recursive = true)
-````
-
+```
 
 
 
@@ -365,45 +345,36 @@ rm("plsdel.jdf", force = true, recursive = true)
 ### Save and load serially
 You can use the `ssavejdf` and `sloadjdf` function to save a `DataFrame`
 serially, i.e. without using parallel processes.
-````julia
+```julia
 @time jdffile = ssavejdf("iris.jdf", a)
-````
-
-
-````
-0.003624 seconds (423 allocations: 669.984 KiB)
-````
-
-
-
-````julia
 @time jdffile = sloadjdf("iris.jdf")
-````
+```
 
-
-````
-0.000776 seconds (545 allocations: 681.672 KiB)
+```
+0.058318 seconds (191.73 k allocations: 10.835 MiB)
+  0.031321 seconds (73.96 k allocations: 4.492 MiB)
 150×5 DataFrame
-│ Row │ SepalLength │ SepalWidth │ PetalLength │ PetalWidth │ Species   │
-│     │ Float64     │ Float64    │ Float64     │ Float64    │ Cat…      │
-├─────┼─────────────┼────────────┼─────────────┼────────────┼───────────┤
-│ 1   │ 5.1         │ 3.5        │ 1.4         │ 0.2        │ setosa    │
-│ 2   │ 4.9         │ 3.0        │ 1.4         │ 0.2        │ setosa    │
-│ 3   │ 4.7         │ 3.2        │ 1.3         │ 0.2        │ setosa    │
-│ 4   │ 4.6         │ 3.1        │ 1.5         │ 0.2        │ setosa    │
-│ 5   │ 5.0         │ 3.6        │ 1.4         │ 0.2        │ setosa    │
-│ 6   │ 5.4         │ 3.9        │ 1.7         │ 0.4        │ setosa    │
-│ 7   │ 4.6         │ 3.4        │ 1.4         │ 0.3        │ setosa    │
-⋮
-│ 143 │ 5.8         │ 2.7        │ 5.1         │ 1.9        │ virginica │
-│ 144 │ 6.8         │ 3.2        │ 5.9         │ 2.3        │ virginica │
-│ 145 │ 6.7         │ 3.3        │ 5.7         │ 2.5        │ virginica │
-│ 146 │ 6.7         │ 3.0        │ 5.2         │ 2.3        │ virginica │
-│ 147 │ 6.3         │ 2.5        │ 5.0         │ 1.9        │ virginica │
-│ 148 │ 6.5         │ 3.0        │ 5.2         │ 2.0        │ virginica │
-│ 149 │ 6.2         │ 3.4        │ 5.4         │ 2.3        │ virginica │
-│ 150 │ 5.9         │ 3.0        │ 5.1         │ 1.8        │ virginica │
-````
+ Row │ SepalLength  SepalWidth  PetalLength  PetalWidth  Species
+     │ Float64      Float64     Float64      Float64     Cat…
+─────┼─────────────────────────────────────────────────────────────
+   1 │         5.1         3.5          1.4         0.2  setosa
+   2 │         4.9         3.0          1.4         0.2  setosa
+   3 │         4.7         3.2          1.3         0.2  setosa
+   4 │         4.6         3.1          1.5         0.2  setosa
+   5 │         5.0         3.6          1.4         0.2  setosa
+   6 │         5.4         3.9          1.7         0.4  setosa
+   7 │         4.6         3.4          1.4         0.3  setosa
+   8 │         5.0         3.4          1.5         0.2  setosa
+  ⋮  │      ⋮           ⋮            ⋮           ⋮           ⋮
+ 144 │         6.8         3.2          5.9         2.3  virginica
+ 145 │         6.7         3.3          5.7         2.5  virginica
+ 146 │         6.7         3.0          5.2         2.3  virginica
+ 147 │         6.3         2.5          5.0         1.9  virginica
+ 148 │         6.5         3.0          5.2         2.0  virginica
+ 149 │         6.2         3.4          5.4         2.3  virginica
+ 150 │         5.9         3.0          5.1         1.8  virginica
+                                                   135 rows omitted
+```
 
 
 
@@ -414,20 +385,19 @@ serially, i.e. without using parallel processes.
 RAM. One can use the function `type_compress!(df)`  to compress any
 `df::DataFrame`. E.g.
 
-````julia
+```julia
 type_compress!(df)
-````
+```
 
-
-````
+```
 3×2 DataFrame
-│ Row │ a    │ b    │
-│     │ Int8 │ Int8 │
-├─────┼──────┼──────┤
-│ 1   │ 1    │ 1    │
-│ 2   │ 2    │ 2    │
-│ 3   │ 3    │ 3    │
-````
+ Row │ a     b
+     │ Int8  Int8
+─────┼────────────
+   1 │    1     1
+   2 │    2     2
+   3 │    3     3
+```
 
 
 
@@ -437,20 +407,19 @@ The function looks at `Int*` columns and see if it can be safely "downgraded" to
 another `Int*` type with a smaller bits size. It will convert `Float64` to
 `Float32` if `compress_float = true`. E.g.
 
-````julia
+```julia
 type_compress!(df, compress_float = true)
-````
+```
 
-
-````
+```
 3×2 DataFrame
-│ Row │ a    │ b    │
-│     │ Int8 │ Int8 │
-├─────┼──────┼──────┤
-│ 1   │ 1    │ 1    │
-│ 2   │ 2    │ 2    │
-│ 3   │ 3    │ 3    │
-````
+ Row │ a     b
+     │ Int8  Int8
+─────┼────────────
+   1 │    1     1
+   2 │    2     2
+   3 │    3     3
+```
 
 
 

@@ -38,8 +38,8 @@ By default JDF loads and saves `DataFrame`s using multiple threads starting from
 Julia 1.3. For Julia < 1.3, it saves and loads using one thread only.
 
 ```julia
-@time jdffile = savejdf("iris.jdf", a)
-@time a2 = loadjdf("iris.jdf")
+@time jdffile = JDF.save("iris.jdf", a)
+@time a2 = DataFrame(JDF.load("iris.jdf"))
 ```
 
 Simple checks for correctness
@@ -52,7 +52,7 @@ all(skipmissing([all(a2[!,name] .== Array(a[!,name])) for name in names(a2)])) #
 You can load only a few columns from the dataset by specifying `cols =
 [:column1, :column2]`. For example
 ```julia
-a2_selected = loadjdf("iris.jdf", cols = [:Species, :SepalLength, :PetalWidth])
+a2_selected = DataFrame(JDF.load("iris.jdf", cols = [:Species, :SepalLength, :PetalWidth]))
 ```
 The difference with loading the whole datasets and then subsetting the columns
 is that it saves time as only the selected columns are loaded from disk.

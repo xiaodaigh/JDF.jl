@@ -8,8 +8,8 @@ using CategoricalArrays
     df = DataFrame([collect(1:100) for i = 1:3])
     df[!, :x1] = categorical(df[!, :x1])
     df[!, :x2] = categorical(string.(df[!, :x2]))
-    savejdf(df, "a3cate.jdf")
-    df2 = JDF.load("a3cate.jdf", cols = [:x2, :x1])
+    JDF.save(df, "a3cate.jdf")
+    df2 = DataFrame(JDF.load("a3cate.jdf", cols = [:x2, :x1]); copycols=false)
     @test size(df2, 2) == 2
     @test size(df2, 1) == 100
     @time df2[!, :x1] isa CategoricalVector{Int}

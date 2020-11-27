@@ -1,3 +1,5 @@
+using Missings: allowmissing
+
 some_elm(::Type{Missing}) = missing
 
 

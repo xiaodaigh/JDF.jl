@@ -2,7 +2,6 @@ __precompile__(true)
 module JDF
 
 using Blosc: Blosc
-using DataFrames
 using Missings: Missings
 using BufferedStreams
 #using RLEVectors
@@ -15,8 +14,6 @@ import Base: show, getindex, setindex!, eltype, names
 using Base: size#, @v_str, >=, include, VERSION
 
 using Serialization: serialize, deserialize
-
-import DataFrames: nrow, ncol
 
 if VERSION >= v"1.3.0"
     import Base.Threads: @spawn
@@ -38,7 +35,7 @@ export savejdf, loadjdf, ssavejdf, sloadjdf#, save, load
 export column_loader, column_loader!
 export type_compress!, type_compress
 export compress_then_write
-export JDFFile, @jdf_str, jdfmetadata, metadata, nrow, ncol, size, names
+export JDFFile, @jdf_str, jdfmetadata, metadata, size, names
 export IsBitsType, eachcol, some_elm, getindex, istable
 
 
@@ -64,7 +61,7 @@ include("type_compress.jl")
 
 include("metadata.jl")
 include("eachcol.jl")
-include("dataframe-syntax.jl")
+include("getindex-view.jl")
 include("Tables.jl")
 
 # Blosc.set_num_threads(6)

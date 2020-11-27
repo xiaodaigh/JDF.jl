@@ -1,18 +1,17 @@
-
 """
-    loadjdf(indir, verbose = true)
+    JDF.load(indir, verbose = true)
 
-    loadjdf(indir, cols = Vector{Symbol}, verbose = true)
+    JDF.load(indir, cols = Vector{Symbol}, verbose = true)
 
-Load a `DataFrame` from JDF saved at `outdir`. On Julia > v1.3, a multithreaded
+Load a `Tables.jl` table from JDF saved at `outdir`. On Julia > v1.3, a multithreaded
 version is used.
 """
-loadjdf(indir; cols = Symbol[], verbose = false) = begin
+load(indir; cols = Symbol[], verbose = false) = begin
     # starting from DataFrames.jl 0.21 the colnames are strings
     cols = string.(cols)
 
     if VERSION < v"1.3.0"
-        return sloadjdf(indir, cols = cols, verbose = verbose)
+        return sload(indir, cols = cols, verbose = verbose)
     end
 
     if verbose
@@ -31,8 +30,6 @@ loadjdf(indir; cols = Symbol[], verbose = false) = begin
             throw("columns $(reduce((x,y) -> string(x) * ", " * string(y), scmn)) are not available, please ensure you have spelt them correctly")
         end
     end
-
-    df = DataFrame()
 
     # get the maximum number of bytes needs to read
     # bytes_needed = maximum(get_bytes.(metadatas.metadatas))
@@ -59,9 +56,11 @@ loadjdf(indir; cols = Symbol[], verbose = false) = begin
         end
     end
 
-    # run this serially
+    # run the collection of results this serially
     #println(results)
-    for result in results
+
+    result_vectors = Vector{Any}(undef, length(cols))
+    for (i, result) in enumerate(results)
         if verbose
             println("Extracting $(fetch(result).name)")
         end
@@ -69,19 +68,20 @@ loadjdf(indir; cols = Symbol[], verbose = false) = begin
         new_result = fetch(result).task
         colname = fetch(result).name
         if new_result == nothing
-            df[!, Symbol(colname)] = Vector{Missing}(missing, metadatas.rows)
+            result_vectors[i] = Vector{Missing}(missing, metadatas.rows)
         else
-            df[!, Symbol(colname)] = new_result
+            result_vectors[i] = new_result
         end
     end
-    df
+
+    NamedTuple{Tuple(Symbol.(cols))}(result_vectors)
 end
 
-loadjdf(jdf::JDFFile; args...) = loadjdf(path(jdf); args...)
-sloadjdf(jdf::JDFFile; args...) = sloadjdf(path(jdf); args...)
+load(jdf::JDFFile; args...) = load(path(jdf); args...)
+sload(jdf::JDFFile; args...) = sload(path(jdf); args...)
 
 # load the data from file with a schema
-sloadjdf(indir; cols = Symbol[], verbose = false) = begin
+function sload(indir; cols = Symbol[], verbose = false)
     metadatas = open(joinpath(indir, "metadata.jls")) do io
         deserialize(io)
     end
@@ -94,8 +94,6 @@ sloadjdf(indir; cols = Symbol[], verbose = false) = begin
             throw("columns $(reduce((x,y) -> string(x) * ", " * string(y), scmn)) are not available, please ensure you have spelt them correctly")
         end
     end
-
-    df = DataFrame()
 
     # get the maximum number of bytes needs to read
     # bytes_needed = maximum(get_bytes.(metadatas.metadatas))
@@ -120,8 +118,9 @@ sloadjdf(indir; cols = Symbol[], verbose = false) = begin
         end
     end
 
+    result_vectors = Vector{Any}(undef, length(results))
     # run this serially
-    for result in results
+    for (i, result) in enumerate(results)
         if verbose
             println("Extracting $(result.name)")
             println(result.task)
@@ -130,13 +129,14 @@ sloadjdf(indir; cols = Symbol[], verbose = false) = begin
         new_result = result.task
         colname = result.name
         if new_result == nothing
-            df[!, colname] = Vector{Missing}(missing, metadatas.rows)
+           result_vectors[i] = Vector{Missing}(missing, metadatas.rows)
         else
-            df[!, colname] = new_result
+            result_vectors[i] = new_result
         end
     end
-    df
+
+    NamedTuple{Tuple(Symbol.(cols))}(result_vectors)
 end
 
-load(args...; kwargs...) = loadjdf(args...; kwargs...)
-sload(args...; kwargs...) = sloadjdf(args...; kwargs...)
+loadjdf(args...; kwargs...) = load(args...; kwargs...)
+sloadjdf(args...; kwargs...) = sload(args...; kwargs...)

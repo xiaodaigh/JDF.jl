@@ -2,6 +2,8 @@
 using Pkg
 cd("c:/git/JDF/readme-build")
 Pkg.activate("c:/git/JDF/readme-build")
+Pkg.update()
+upcheck()
 
 using Weave
 
