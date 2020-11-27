@@ -13,7 +13,7 @@ using JDF
     df[!, :stringarray_missing] =
         StringVector([rand([missing, randstring(8)]) for i = 1:nrow(df)])
 
-    savejdf("a.jdf", df)
+    JDF.save("a.jdf", df)
 
     dfjdf = jdf"a.jdf"
 

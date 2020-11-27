@@ -1,4 +1,3 @@
-#using Revise
 using Test
 using JDF, TimeZones, DataFrames
 
@@ -19,9 +18,9 @@ end
 
 df = DataFrame(ar = ar)
 
-savejdf(df, "df.jdf")
+JDF.save(df, "df.jdf")
 
-df_loaded = loadjdf("df.jdf")
+df_loaded = DataFrame(JDF.load("df.jdf"))
 
 @test df == df_loaded
 

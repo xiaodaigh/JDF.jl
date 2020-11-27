@@ -1,4 +1,3 @@
-# using Revise
 using Test
 using JDF, DataFrames
 
@@ -7,7 +6,6 @@ using JDF, DataFrames
     metadata_ac = open("io.jdf", "w") do io
         compress_then_write(ac, io)
     end
-
 
     a = [:a, :b, :a, missing, :c]
     metadata = open("io.jdf", "w") do io
@@ -19,8 +17,8 @@ using JDF, DataFrames
     end
 
     df = DataFrame(a = a, ac = ac)
-    savejdf("pls_del.jdf", df)
-    df2 = loadjdf("pls_del.jdf")
+    JDF.save("pls_del.jdf", df)
+    df2 = DataFrame(JDF.load("pls_del.jdf"); copycols=false)
 
     @test size(df) == size(df2)
     @test all(isequal.(df.a, df2.a))
