@@ -10,7 +10,6 @@ include("test-symbol.jl")
 include("test-jdf-str.jl")
 include("test-eachcol.jl")
 include("test-ZonedDateTime.jl")
-include("test-dataframe-syntax.jl")
 include("test-substring.jl")
 
 @testset "JDF.jl parallel" begin
@@ -31,11 +30,11 @@ include("test-substring.jl")
     df[rand(1:nrow(df), 10), :char_missing] .= missing
 
     @time JDF.save("a.jdf", df)
-    @time df2 = JDF.load("a.jdf")
+    @time df2 = DataFrame(JDF.load("a.jdf"), copycols=false)
 
     isequal(df, df2)
 
-    df2 = loadjdf("a.jdf")
+    df2 = DataFrame(JDF.load("a.jdf"), copycols=false)
     @test ncol(df2) == 3009
     @test nrow(df2) == 100
 
@@ -66,7 +65,7 @@ end
 
     ssavejdf("a.jdf", df)
 
-    df2 = sloadjdf("a.jdf")
+    df2 = DataFrame(sloadjdf("a.jdf"), copycols=false)
     @test ncol(df2) == 3009
     @test nrow(df2) == 100
 

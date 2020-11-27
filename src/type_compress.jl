@@ -15,7 +15,8 @@ be converted to `CategoricalVector` and otherwise will be stored as
 If `compress_float = true` then `Float64` will be downgraded to `Float32`; but
 beware that this means the calculation will be done with reduce precision.
 """
-type_compress!(df::DataFrame; compress_float = false, verbose = false) = begin
+type_compress!(df; compress_float = false, verbose = false) = begin
+    @assert Tables.istable(df)
     for n in names(df)
         if verbose
             println("Compressing $n")

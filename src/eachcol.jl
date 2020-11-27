@@ -1,10 +1,4 @@
-# if VERSION < v"1.1"
-#     import Compat:eachcol
-# else
-import DataFrames: eachcol
-# end
-
-import Base: iterate, length
+import Base: iterate, length, eachcol
 
 struct JDFFileColIterator
     jdf::JDFFile
@@ -20,6 +14,6 @@ Base.iterate(jdf::JDFFileColIterator, state = 1) = begin
         return nothing
     end
 
-    res1 = sloadjdf(jdf.jdf, cols = [jdf.cols[state]])[!, 1]
+    res1 = sload(jdf.jdf, cols = [jdf.cols[state]])[1]
     return (res1, state + 1)
 end

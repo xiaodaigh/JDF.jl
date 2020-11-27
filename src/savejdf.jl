@@ -1,3 +1,5 @@
+using Tables
+
 """
     some_elm(::Type{T})
 
@@ -24,14 +26,14 @@ some_elm(::Type{T}) where {T} = begin
 end
 
 """
-    savejdf(outdir, dataframe)
+    JDF.save(outdir, table)
 
-    savejdf(dataframe, outdir)
+    JDF.save(table, outdir)
 
-Save a `DataFrame` to the `outdir`. On Julia > v1.3, a multithreaded version is
+Save a `Tables.jl` compatitable table to the `outdir`. On Julia > v1.3, a multi-threaded version is
 used.
 
-The columns of the dataframe can be of the following vector types columns are
+The columns of the table can be of the following vector types columns are
 supported
 
     * `isbits` types e.g. `Int*`, `UInt*`, `Float*`
@@ -42,31 +44,33 @@ supported
     * `Union{Missing, T}`` for `T` support above
 
 """
-savejdf(df::AbstractDataFrame, outdir::AbstractString) = savejdf(outdir, df)
+save(df, outdir::AbstractString; kwargs...) = save(outdir, df; kwargs...)
 
-savejdf(outdir, df::AbstractDataFrame; verbose = false) = begin
+function save(outdir::AbstractString, df; verbose = false)
+    @assert Tables.istable(df)
+
     if VERSION < v"1.3.0-rc1"
         return ssavejdf(outdir, df)
     end
 
-    pmetadatas = Any[missing for i = 1:length(DataFrames.names(df))]
+    pmetadatas = Any[missing for i = 1:length(Tables.columnnames(df))]
 
     if !isdir(outdir)
         mkpath(outdir)
     end
 
-    # use a bounded channel to limit
+    # use a bounded channel to limit the number simultaneous writes
     c1 = Channel{Bool}(Threads.nthreads())
     atexit(() -> close(c1))
 
-    for (i, n) in enumerate(DataFrames.names(df))
+    for (i, n) in enumerate(Tables.columnnames(df))
         if verbose
             println(n)
         end
         put!(c1, true)
         pmetadatas[i] = @spawn begin
             io = BufferedOutputStream(open(joinpath(outdir, string(n)), "w"))
-            res = compress_then_write(df[!, i], io)
+            res = compress_then_write(Tables.getcolumn(df, n), io)
             close(io)
             res
         end
@@ -76,8 +80,8 @@ savejdf(outdir, df::AbstractDataFrame; verbose = false) = begin
     metadatas = fetch.(pmetadatas)
 
     fnl_metadata = (
-        names = DataFrames.names(df),
-        rows = DataFrames.size(df, 1),
+        names = Tables.columnnames(df),
+        rows = size(df, 1),
         metadatas = metadatas,
         version = v"0.2",
     )
@@ -90,25 +94,26 @@ savejdf(outdir, df::AbstractDataFrame; verbose = false) = begin
 end
 
 """
-    serially save a DataFrames to the outdir
+    Serially save a Tables.jl compatible table to the `outdir`
 """
-ssavejdf(outdir, df::AbstractDataFrame) = begin
-    pmetadatas = Any[missing for i = 1:length(DataFrames.names(df))]
+function ssave(outdir::AbstractString, df)
+    colnames = Tables.columnnames(df)
+    pmetadatas = Any[missing for i = 1:length(colnames)]
 
     if !isdir(outdir)
         mkpath(outdir)
     end
 
-    for i = 1:length(DataFrames.names(df))
-        io = BufferedOutputStream(open(joinpath(outdir, string(DataFrames.names(df)[i])), "w"))
-        pmetadatas[i] = compress_then_write(df[!, i], io)
+    for i = 1:length(colnames)
+        io = BufferedOutputStream(open(joinpath(outdir, string(colnames[i])), "w"))
+        pmetadatas[i] = compress_then_write(Tables.getcolumn(df, colnames[i]), io)
         close(io)
     end
 
 
     fnl_metadata = (
-        names = DataFrames.names(df),
-        rows = DataFrames.size(df, 1),
+        names = colnames,
+        rows = size(df, 1),
         metadatas = pmetadatas,
         version = v"0.2",
     )
@@ -120,6 +125,7 @@ ssavejdf(outdir, df::AbstractDataFrame) = begin
 end
 
 # figure out from metadata how much space is allocated
+""" Get tthe number of bytes used by the file"""
 get_bytes(metadata) = begin
     if metadata.type == String
         return max(metadata.string_compressed_bytes, metadata.string_len_bytes)
@@ -134,5 +140,5 @@ end
 
 hasfieldnames(::Type{T}) where {T} = fieldnames(T) >= 1
 
-save(args...; kwargs...) = savejdf(args...; kwargs...)
-ssave(args...; kwargs...) = ssavejdf(args...; kwargs...)
+savejdf(args...; kwargs...) = save(args...; kwargs...)
+ssavejdf(args...; kwargs...) = ssave(args...; kwargs...)
