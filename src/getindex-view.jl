@@ -5,14 +5,14 @@ import Base: getindex, view
 
 export getindex
 
-Base.getindex(file::JDFFile, rows, col::String) = begin
-    loadjdf(file; cols = [col])[rows, 1]
+function Base.getindex(file::JDFFile, rows, col::String)
+    JDF.load(file; cols = [col])[rows, 1]
 end
 
 Base.getindex(file::JDFFile, rows, cols::AbstractVector{String}) = begin
-    loadjdf(file; cols = cols)[rows, :]
+    JDF.load(file; cols = cols)[rows, :]
 end
 
 Base.view(file::JDFFile, rows, cols) = getindex(file, rows, cols)
 
-getindex(file::JDFFile, rows, cols) = loadjdf(file)[rows, cols]
+getindex(file::JDFFile, rows, cols) = JDF.load(file)[rows, cols]
