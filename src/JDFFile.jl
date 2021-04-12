@@ -1,11 +1,14 @@
-export JDFFile, @jdf_str, path
+export JDFFile, @jdf_str, path, getindex
+
+import Base: getindex, view
+
 
 """
     jdf"path/to/JDFfile.jdf"
 
     JDFFile("path/to/JDFfile.jdf")
 
-Define a JDF file, which you can apply `names` and `size`.
+Define a JDF file, which you use with methods like  `names` and `size`.
 
 ## Example
 using JDF, DataFrames
@@ -59,3 +62,17 @@ end
 Return the path of the JDF
 """
 path(jdf) = getfield(jdf, :path)
+
+
+function Base.getindex(file::JDFFile, rows, col::String)
+    # TODO make it load from column loader for faster access
+    getfield(JDF.load(file; cols = [col]), Symbol(col))[rows]
+end
+
+function Base.getindex(file::JDFFile, rows, cols::AbstractVector{String})
+    JDF.load(file; cols = cols)[rows, :]
+end
+
+Base.view(file::JDFFile, rows, cols) = getindex(file, rows, cols)
+
+getindex(file::JDFFile, rows, cols) = JDF.load(file)[rows, cols]

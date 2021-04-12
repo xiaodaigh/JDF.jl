@@ -1,7 +1,7 @@
 name = "JDF"
 uuid = "babc3d20-cd49-4f60-a736-a8f9c08892d3"
 authors = ["Dai ZJ <zhuojia.dai@gmail.com>"]
-version = "0.3.0"
+version = "0.4.0"
 
 [deps]
 Blosc = "a74b3585-a348-5f62-a45c-50e91977d574"
@@ -22,7 +22,7 @@ BufferedStreams = "1.0"
 CategoricalArrays = "0.5, 0.6, 0.7, 0.8, 0.9"
 DataAPI = "1"
 Missings = "0.4"
-PooledArrays = "0.5"
+PooledArrays = "1"
 StatsBase = "0.32, 0.33"
 Tables = "1"
 TimeZones = "0.10, 1"

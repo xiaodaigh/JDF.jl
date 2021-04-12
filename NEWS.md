@@ -1,3 +1,6 @@
+## 0.4
+Returning a JDFFile type that is Tables.jl compatible
+
 ## 0.2.19
 Added support for `SubString{String}`
 

@@ -4,7 +4,7 @@ using Random: randstring
 using WeakRefStrings: StringVector
 
 @testset "JDF.jl eachcol" begin
-    df = DataFrame([collect(1:100) for i = 1:3000])
+    df = DataFrame([collect(1:100) for i = 1:3000], :auto)
     df[!, :int_missing] =
         rand([rand(rand([UInt, Int, Float64, Float32, Bool])), missing], size(df, 1))
 
@@ -27,9 +27,9 @@ using WeakRefStrings: StringVector
     @test size(df2, 2) == 3009
     @test size(df2, 1) == 100
 
-    df3 = [a for a in eachcol(df2)]
+    @time df3 = [a for a in eachcol(df2)]
 
-    df4 = DataFrame(df3)
+    df4 = DataFrame(df3, :auto)
 
     @test size(df4) == size(df)
     @test all([isequal(df4[!, n], df[!, n]) for n = 1:size(df4, 2)])
