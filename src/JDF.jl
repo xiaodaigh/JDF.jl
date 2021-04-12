@@ -55,20 +55,13 @@ include("type-writer-loader/substring.jl")
 include("column_loader.jl")
 include("compress_then_write.jl")
 
-<<<<<<< Updated upstream
 include("load-columns.jl")
-=======
->>>>>>> Stashed changes
 include("loadjdf.jl")
 include("savejdf.jl")
 include("type_compress.jl")
 
 include("metadata.jl")
 include("eachcol.jl")
-<<<<<<< Updated upstream
-=======
-include("getindex-view.jl")
->>>>>>> Stashed changes
 include("Tables.jl")
 
 # Blosc.set_num_threads(6)
