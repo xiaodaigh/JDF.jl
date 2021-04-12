@@ -1,5 +1,5 @@
 @testset "JDF.jl jdf_str" begin
-    df = DataFrame([collect(1:100) for i = 1:3000])
+    df = DataFrame([collect(1:100) for i = 1:3000], :auto)
     df[!, :int_missing] =
         rand([rand(rand([UInt, Int, Float64, Float32, Bool])), missing], size(df, 1))
 

@@ -13,7 +13,7 @@ include("test-ZonedDateTime.jl")
 include("test-substring.jl")
 
 @testset "JDF.jl parallel" begin
-    df = DataFrame([collect(1:100) for i = 1:3000])
+    df = DataFrame([collect(1:100) for i = 1:3000], :auto)
     df[!, :int_missing] =
         rand([rand(rand([UInt, Int, Float64, Float32, Bool])), missing], nrow(df))
 
@@ -47,7 +47,7 @@ include("test-substring.jl")
 end
 
 @testset "JDF.jl serial" begin
-    df = DataFrame([collect(1:100) for i = 1:3000])
+    df = DataFrame([collect(1:100) for i = 1:3000], :auto)
     df[!, :int_missing] =
         rand([rand(rand([UInt, Int, Float64, Float32, Bool])), missing], nrow(df))
 
@@ -63,9 +63,9 @@ end
     df[!, :char_missing] = allowmissing(df[!, :char])
     df[rand(1:nrow(df), 10), :char_missing] .= missing
 
-    ssavejdf("a.jdf", df)
+    JDF.ssave("a.jdf", df)
 
-    df2 = DataFrame(sloadjdf("a.jdf"), copycols=false)
+    df2 = DataFrame(JDF.sload("a.jdf"), copycols=false)
     @test ncol(df2) == 3009
     @test nrow(df2) == 100
 
