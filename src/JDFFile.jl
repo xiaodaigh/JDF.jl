@@ -1,14 +1,22 @@
+<<<<<<< Updated upstream
 export JDFFile, @jdf_str, path, getindex
 
 import Base: getindex, view
 
+=======
+export JDFFile, @jdf_str, path
+>>>>>>> Stashed changes
 
 """
     jdf"path/to/JDFfile.jdf"
 
     JDFFile("path/to/JDFfile.jdf")
 
+<<<<<<< Updated upstream
 Define a JDF file, which you use with methods like  `names` and `size`.
+=======
+Define a JDF file, which you can apply `names` and `size`.
+>>>>>>> Stashed changes
 
 ## Example
 using JDF, DataFrames
@@ -62,6 +70,7 @@ end
 Return the path of the JDF
 """
 path(jdf) = getfield(jdf, :path)
+<<<<<<< Updated upstream
 
 
 function Base.getindex(file::JDFFile, rows, col::String)
@@ -76,3 +85,5 @@ end
 Base.view(file::JDFFile, rows, cols) = getindex(file, rows, cols)
 
 getindex(file::JDFFile, rows, cols) = JDF.load(file)[rows, cols]
+=======
+>>>>>>> Stashed changes
