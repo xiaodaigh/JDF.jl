@@ -2,7 +2,7 @@ import Tables: rows, columns, istable, rowaccess, columnaccess, schema, Schema
 
 import Base: propertynames, getproperty
 
-export istable
+export istable, columns
 
 istable(::Type{JDFFile}) = true
 istable(::JDFFile) = true
@@ -15,7 +15,7 @@ columnaccess(::Type{<:JDFFile}) = true
 
 propertynames(jdf::JDFFile) = names(jdf)
 
-getproperty(jdf::JDFFile, col::Symbol) = jdf[!, col]
+getproperty(jdf::JDFFile, col::Symbol) =  JDF.load(jdf; cols = [col]).columns[col]
 
 schema(jdf::JDFFile) = begin
     meta = metadata(jdf)
@@ -23,3 +23,17 @@ schema(jdf::JDFFile) = begin
 end
 
 columns(jdf::JDFFile) = jdf
+
+# this is the table type specific to JDF
+struct Table
+    columns::NamedTuple
+end
+
+
+nrow(t::Table) = length(t.columns[1])
+
+ncol(t::Table) = length(t.columns)
+
+Tables.columns(t::Table) = t.columns
+
+Tables.istable(t::Table) = true

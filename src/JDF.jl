@@ -55,13 +55,13 @@ include("type-writer-loader/substring.jl")
 include("column_loader.jl")
 include("compress_then_write.jl")
 
+include("load-columns.jl")
 include("loadjdf.jl")
 include("savejdf.jl")
 include("type_compress.jl")
 
 include("metadata.jl")
 include("eachcol.jl")
-include("getindex-view.jl")
 include("Tables.jl")
 
 # Blosc.set_num_threads(6)
