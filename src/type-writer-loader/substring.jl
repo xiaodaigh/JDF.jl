@@ -1,6 +1,6 @@
 
 function compress_then_write(b::Vector{SubString{String}}, io)
-    @warn "JDF is write a SubString vector. When loaded back it will be a String vector not a SubString vector"
+    @warn "JDF is writing a SubString vector. When loaded back it will be a String vector not a SubString vector"
     compress_then_write(String.(b), io)
 end
 
