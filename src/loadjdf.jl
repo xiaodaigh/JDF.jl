@@ -9,9 +9,7 @@ version is used.
 load(indir; cols = Symbol[], verbose = false) = begin
     # starting from DataFrames.jl 0.21 the colnames are strings
     cols = string.(cols)
-    metadatas = open(joinpath(indir, "metadata.jls")) do io
-        deserialize(io)
-    end
+    metadatas = jdfmetadata(indir)
 
     # TODO simplify this this is duplicated in load_columns
     if length(cols) == 0
@@ -34,9 +32,7 @@ sload(jdf::JDFFile; args...) = sload(path(jdf); args...)
 # load the data from file with a schema
 function sload(indir; cols = Symbol[], verbose = false)
     cols = string.(cols)
-    metadatas = open(joinpath(indir, "metadata.jls")) do io
-        deserialize(io)
-    end
+    metadatas = jdfmetadata(indir)
 
     # TODO simplify this
     if length(cols) == 0
