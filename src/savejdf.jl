@@ -5,7 +5,7 @@ using Tables
 
 Some arbitrary element of type `T`
 """
-some_elm(::Type{T}) where {T} = begin
+function some_elm(::Type{T}) where {T}
     try
         return zero(T)
     catch
@@ -24,6 +24,8 @@ some_elm(::Type{T}) where {T} = begin
         end
     end
 end
+
+some_elm(::Type{Date}) = Date(0)
 
 """
     JDF.save(outdir, table)

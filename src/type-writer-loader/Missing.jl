@@ -4,7 +4,7 @@ some_elm(::Type{Missing}) = missing
 
 
 # the dispatch for Union{T, Missing}
-# 1. comporess the missing
+# 1. compress the missing
 # 2. and also load the missing
 compress_then_write(b::Vector{Union{T,Missing}}, io) where {T} = begin
     S = nonmissingtype(eltype(b))
@@ -24,7 +24,8 @@ compress_then_write(b::Vector{Union{T,Missing}}, io) where {T} = begin
 end
 
 # just write it out as missing
-compress_then_write(b::Vector{Missing}, io) =
+# notice how io is not needed since nothing need to be written
+compress_then_write(b::Vector{Missing}, _) =
     (len = 0, type = Missing, orig_len = length(b))
 
 column_loader!(buffer, ::Type{Union{Missing,T}}, io, metadata) where {T} = begin
