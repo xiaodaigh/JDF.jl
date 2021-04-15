@@ -1,3 +1,5 @@
+## 0.4.1
+fixed date with missing issues
 
 ## 0.4
 Returning a JDFFile type that is Tables.jl compatible
