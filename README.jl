@@ -6,15 +6,15 @@ a = dataset("datasets", "iris");
 first(a, 2)
 
 
-@time jdffile = savejdf("iris.jdf", a)
-@time a2 = loadjdf("iris.jdf")
+@time jdffile = JDF.save("iris.jdf", a)
+@time a2 = DataFrame(JDF.load("iris.jdf"))
 
 
 all(names(a2) .== names(a)) # true
 all(skipmissing([all(a2[!,name] .== Array(a[!,name])) for name in names(a2)])) #true
 
 
-a2_selected = loadjdf("iris.jdf", cols = [:Species, :SepalLength, :PetalWidth])
+a2_selected = DataFrame(JDF.load("iris.jdf", cols = [:Species, :SepalLength, :PetalWidth]))
 
 
 jdf"path/to/JDF.jdf"

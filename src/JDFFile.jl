@@ -2,7 +2,6 @@ export JDFFile, @jdf_str, path, getindex
 
 import Base: getindex, view
 
-
 """
     jdf"path/to/JDFfile.jdf"
 
@@ -63,16 +62,26 @@ Return the path of the JDF
 """
 path(jdf) = getfield(jdf, :path)
 
+function Base.getindex(file::JDFFile, col::String)
+   getindex(file, Symbol(col))
+end
 
-function Base.getindex(file::JDFFile, rows, col::String)
+function Base.getindex(file::JDFFile, col::Symbol)
     # TODO make it load from column loader for faster access
-    getfield(JDF.load(file; cols = [col]), Symbol(col))[rows]
+    JDF.load(file; cols = [col])[col]
 end
 
-function Base.getindex(file::JDFFile, rows, cols::AbstractVector{String})
-    JDF.load(file; cols = cols)[rows, :]
-end
 
-Base.view(file::JDFFile, rows, cols) = getindex(file, rows, cols)
 
-getindex(file::JDFFile, rows, cols) = JDF.load(file)[rows, cols]
+# function Base.getindex(file::JDFFile, rows, col::String)
+#     # TODO make it load from column loader for faster access
+#     getfield(JDF.load(file; cols = [col]), Symbol(col))[rows]
+# end
+
+# function Base.getindex(file::JDFFile, rows, cols::AbstractVector{String})
+#     JDF.load(file; cols = cols)[rows, :]
+# end
+
+# Base.view(file::JDFFile, rows, cols) = getindex(file, rows, cols)
+
+# getindex(file::JDFFile, rows, cols) = JDF.load(file)[rows, cols]

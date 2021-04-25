@@ -56,8 +56,8 @@ Julia 1.3. For Julia < 1.3, it saves and loads using one thread only.
 ```
 
 ```
-0.094318 seconds (151.78 k allocations: 8.323 MiB, 14.57% gc time)
-  0.352393 seconds (1.16 M allocations: 60.137 MiB, 3.82% gc time)
+0.003842 seconds (342 allocations: 666.312 KiB)
+  0.001220 seconds (868 allocations: 707.312 KiB)
 150×5 DataFrame
  Row │ SepalLength  SepalWidth  PetalLength  PetalWidth  Species
      │ Float64      Float64     Float64      Float64     Cat…
@@ -108,26 +108,26 @@ a2_selected = DataFrame(JDF.load("iris.jdf", cols = [:Species, :SepalLength, :Pe
 
 ```
 150×3 DataFrame
- Row │ SepalLength  PetalWidth  Species
-     │ Float64      Float64     Cat…
-─────┼────────────────────────────────────
-   1 │         5.1         0.2  setosa
-   2 │         4.9         0.2  setosa
-   3 │         4.7         0.2  setosa
-   4 │         4.6         0.2  setosa
-   5 │         5.0         0.2  setosa
-   6 │         5.4         0.4  setosa
-   7 │         4.6         0.3  setosa
-   8 │         5.0         0.2  setosa
-  ⋮  │      ⋮           ⋮           ⋮
- 144 │         6.8         2.3  virginica
- 145 │         6.7         2.5  virginica
- 146 │         6.7         2.3  virginica
- 147 │         6.3         1.9  virginica
- 148 │         6.5         2.0  virginica
- 149 │         6.2         2.3  virginica
- 150 │         5.9         1.8  virginica
-                          135 rows omitted
+ Row │ Species  SepalLength  PetalWidth
+     │ Float64  Float64      Cat…
+─────┼──────────────────────────────────
+   1 │     5.1          0.2  setosa
+   2 │     4.9          0.2  setosa
+   3 │     4.7          0.2  setosa
+   4 │     4.6          0.2  setosa
+   5 │     5.0          0.2  setosa
+   6 │     5.4          0.4  setosa
+   7 │     4.6          0.3  setosa
+   8 │     5.0          0.2  setosa
+  ⋮  │    ⋮          ⋮           ⋮
+ 144 │     6.8          2.3  virginica
+ 145 │     6.7          2.5  virginica
+ 146 │     6.7          2.3  virginica
+ 147 │     6.3          1.9  virginica
+ 148 │     6.5          2.0  virginica
+ 149 │     6.2          2.3  virginica
+ 150 │     5.9          1.8  virginica
+                        135 rows omitted
 ```
 
 
@@ -164,53 +164,44 @@ JDFFile{String}("path/to/JDF.jdf")
 
 
 
-#### Using `df[rows, cols]` syntax
-You can load arbitrary `rows` and `cols` using the `df[rows, cols]` syntax. However, some of these operations are not yet optimized and hence may not be efficient.
+#### Using `df[col::Symbol]` syntax
+You can load arbitrary `col` using the `df[col]` syntax. However, some of these operations are not
+yet optimized and hence may not be efficient.
 
 ```julia
 afile = JDFFile("iris.jdf")
 
-afile[!, :Species] # load Species column
-afile[!, [:Species, :PetalLength]] # load Species and PetalLength column
-
-afile[:, :Species] # load Species column
-afile[:, [:Species, :PetalLength]] # load Species and PetalLength column
-
-@view(afile[!, :Species]) # load Species column
-@view(afile[!, [:Species, :PetalLength]]) # load Species and PetalLength column
+afile[:Species] # load Species column
 ```
 
 ```
-150×2 DataFrame
- Row │ Species    PetalLength
-     │ Cat…       Float64
-─────┼────────────────────────
-   1 │ setosa             1.4
-   2 │ setosa             1.4
-   3 │ setosa             1.3
-   4 │ setosa             1.5
-   5 │ setosa             1.4
-   6 │ setosa             1.7
-   7 │ setosa             1.4
-   8 │ setosa             1.5
-  ⋮  │     ⋮           ⋮
- 144 │ virginica          5.9
- 145 │ virginica          5.7
- 146 │ virginica          5.2
- 147 │ virginica          5.0
- 148 │ virginica          5.2
- 149 │ virginica          5.4
- 150 │ virginica          5.1
-              135 rows omitted
+150-element CategoricalArrays.CategoricalArray{String,1,UInt8}:
+ "setosa"
+ "setosa"
+ "setosa"
+ "setosa"
+ "setosa"
+ "setosa"
+ "setosa"
+ "setosa"
+ "setosa"
+ "setosa"
+ ⋮
+ "virginica"
+ "virginica"
+ "virginica"
+ "virginica"
+ "virginica"
+ "virginica"
+ "virginica"
+ "virginica"
+ "virginica"
 ```
 
 
 
 
 
-In fact most syntax for `a[rows, cols]` will work **except** for assignments i.e. `a[!, cols] = something` will **not** work.
-
-This was developed to make it possible for [JLBoost.jl](https://github.com/xiaodaigh/JLBoost.jl) to fit models without loading the whole data into memory, and so the functionalities is kept to a minimum for now.
 
 #### JDFFile is Table.jl columm-accessible
 
@@ -246,8 +237,9 @@ Tables.Schema:
  :SepalWidth      Float64
  :PetalLength     Float64
  :PetalWidth      Float64
- :Species         CategoricalArrays.CategoricalArray{T,1,R,V,C,U} where U w
-here C where V where R<:Integer where T
+ :Species         CategoricalArrays.CategoricalVector{T, R, V, C, U} where 
+{T, R<:Integer, V, C, U} (alias for CategoricalArrays.CategoricalArray{T, 1
+, R, V, C, U} where {T, R<:Integer, V, C, U})
 ```
 
 
@@ -313,27 +305,16 @@ end
 
 
 #### Metadata Names & Size from disk
-You can obtain the column names and size (`nrow` and `ncol`) of a JDF, for
+You can obtain the column names and number of columns `ncol` of a JDF, for
 example:
 
 
 ```julia
 using JDF, DataFrames
 df = DataFrame(a = 1:3, b = 1:3)
-savejdf(df, "plsdel.jdf")
-
+JDF.save(df, "plsdel.jdf")
 
 names(jdf"plsdel.jdf") # [:a, :b]
-
-nrow(jdf"plsdel.jdf") # 3
-
-ncol(jdf"plsdel.jdf") # 2
-
-size(jdf"plsdel.jdf") # (3, 2)
-
-size(jdf"plsdel.jdf", 1) # 2
-
-size(jdf"plsdel.jdf", 2) # 3
 
 # clean up
 rm("plsdel.jdf", force = true, recursive = true)
@@ -351,29 +332,19 @@ serially, i.e. without using parallel processes.
 ```
 
 ```
-0.058318 seconds (191.73 k allocations: 10.835 MiB)
-  0.031321 seconds (73.96 k allocations: 4.492 MiB)
-150×5 DataFrame
- Row │ SepalLength  SepalWidth  PetalLength  PetalWidth  Species
-     │ Float64      Float64     Float64      Float64     Cat…
-─────┼─────────────────────────────────────────────────────────────
-   1 │         5.1         3.5          1.4         0.2  setosa
-   2 │         4.9         3.0          1.4         0.2  setosa
-   3 │         4.7         3.2          1.3         0.2  setosa
-   4 │         4.6         3.1          1.5         0.2  setosa
-   5 │         5.0         3.6          1.4         0.2  setosa
-   6 │         5.4         3.9          1.7         0.4  setosa
-   7 │         4.6         3.4          1.4         0.3  setosa
-   8 │         5.0         3.4          1.5         0.2  setosa
-  ⋮  │      ⋮           ⋮            ⋮           ⋮           ⋮
- 144 │         6.8         3.2          5.9         2.3  virginica
- 145 │         6.7         3.3          5.7         2.5  virginica
- 146 │         6.7         3.0          5.2         2.3  virginica
- 147 │         6.3         2.5          5.0         1.9  virginica
- 148 │         6.5         3.0          5.2         2.0  virginica
- 149 │         6.2         3.4          5.4         2.3  virginica
- 150 │         5.9         3.0          5.1         1.8  virginica
-                                                   135 rows omitted
+0.002812 seconds (270 allocations: 661.562 KiB)
+  0.001119 seconds (776 allocations: 695.188 KiB)
+JDF.Table((SepalLength = [5.1, 4.9, 4.7, 4.6, 5.0, 5.4, 4.6, 5.0, 4.4, 4.9 
+ …  6.7, 6.9, 5.8, 6.8, 6.7, 6.7, 6.3, 6.5, 6.2, 5.9], SepalWidth = [3.5, 3
+.0, 3.2, 3.1, 3.6, 3.9, 3.4, 3.4, 2.9, 3.1  …  3.1, 3.1, 2.7, 3.2, 3.3, 3.0
+, 2.5, 3.0, 3.4, 3.0], PetalLength = [1.4, 1.4, 1.3, 1.5, 1.4, 1.7, 1.4, 1.
+5, 1.4, 1.5  …  5.6, 5.1, 5.1, 5.9, 5.7, 5.2, 5.0, 5.2, 5.4, 5.1], PetalWid
+th = [0.2, 0.2, 0.2, 0.2, 0.2, 0.4, 0.3, 0.2, 0.2, 0.1  …  2.4, 2.3, 1.9, 2
+.3, 2.5, 2.3, 1.9, 2.0, 2.3, 1.8], Species = CategoricalArrays.CategoricalV
+alue{String, UInt8}["setosa", "setosa", "setosa", "setosa", "setosa", "seto
+sa", "setosa", "setosa", "setosa", "setosa"  …  "virginica", "virginica", "
+virginica", "virginica", "virginica", "virginica", "virginica", "virginica"
+, "virginica", "virginica"]))
 ```
 
 

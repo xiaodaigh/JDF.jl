@@ -1,6 +1,6 @@
 import Tables: rows, columns, istable, rowaccess, columnaccess, schema, Schema
 
-import Base: propertynames, getproperty
+import Base: propertynames, getproperty, getindex
 
 export istable, columns
 
@@ -37,3 +37,7 @@ ncol(t::Table) = length(t.columns)
 Tables.columns(t::Table) = t.columns
 
 Tables.istable(t::Table) = true
+
+function Base.getindex(t::Table, col::Symbol)
+    t.columns[col]
+end
