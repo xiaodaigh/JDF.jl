@@ -18,11 +18,6 @@ like compression and encapsulating the underlying struture of the arrays that's
 hard to do in R and Python. E.g. Python's numpy arrays are C objects, but all
 the vector types used in JDF are Julia data types.
 
-## Please note
-
-The next version of JDF which is v0.3 will contain breaking changes. But don't worry I am fully committed to providing an automatic upgrade path for JDF v0.2 users. This means that you can safely use JDF.jl v0.2 to save your data and not have to worry about the impending breaking change breaking all your JDF files.
-
-
 ## Example: Quick Start
 
 ```julia
