@@ -20,7 +20,7 @@ the vector types used in JDF are Julia data types.
 
 ## Please note
 
-The next version of JDF which is v0.3 will contain breaking changes. But don't worry I am fully committed to providing an automatic upgrade path for JDF v0.2 users. This means that you can safely use JDF.jl v0.2 to save your data and not have to worry about the impending breaking change breaking all your JDF files.
+The next major version of JDF will contain breaking changes. But don't worry I am fully committed to providing an automatic upgrade path. This means that you can safely use JDF.jl to save your data and not have to worry about the impending breaking change breaking all your JDF files.
 
 
 ## Example: Quick Start
@@ -34,6 +34,7 @@ first(a, 2)
 ```
 
 ```
+[ Info: Precompiling JDF [babc3d20-cd49-4f60-a736-a8f9c08892d3]
 2×5 DataFrame
  Row │ SepalLength  SepalWidth  PetalLength  PetalWidth  Species
      │ Float64      Float64     Float64      Float64     Cat…
@@ -56,8 +57,9 @@ Julia 1.3. For Julia < 1.3, it saves and loads using one thread only.
 ```
 
 ```
-0.003842 seconds (342 allocations: 666.312 KiB)
-  0.001220 seconds (868 allocations: 707.312 KiB)
+0.740554 seconds (1.72 M allocations: 94.193 MiB, 1.98% gc time)
+  1.788809 seconds (4.51 M allocations: 290.662 MiB, 4.51% gc time, 37.65% 
+compilation time)
 150×5 DataFrame
  Row │ SepalLength  SepalWidth  PetalLength  PetalWidth  Species
      │ Float64      Float64     Float64      Float64     Cat…
@@ -144,7 +146,7 @@ jdf"path/to/JDF.jdf"
 ```
 
 ```
-JDFFile{String}("path/to/JDF.jdf")
+JDF.JDFFile{String}("path/to/JDF.jdf")
 ```
 
 
@@ -157,7 +159,7 @@ JDFFile(path_to_JDF)
 ```
 
 ```
-JDFFile{String}("path/to/JDF.jdf")
+JDF.JDFFile{String}("path/to/JDF.jdf")
 ```
 
 
@@ -222,7 +224,7 @@ Tables.columns(ajdf)
 ```
 
 ```
-JDFFile{String}("iris.jdf")
+JDF.JDFFile{String}("iris.jdf")
 ```
 
 
@@ -233,13 +235,12 @@ Tables.schema(ajdf)
 
 ```
 Tables.Schema:
- :SepalLength  …  Float64
- :SepalWidth      Float64
- :PetalLength     Float64
- :PetalWidth      Float64
- :Species         CategoricalArrays.CategoricalVector{T, R, V, C, U} where 
-{T, R<:Integer, V, C, U} (alias for CategoricalArrays.CategoricalArray{T, 1
-, R, V, C, U} where {T, R<:Integer, V, C, U})
+ :SepalLength  Float64
+ :SepalWidth   Float64
+ :PetalLength  Float64
+ :PetalWidth   Float64
+ :Species      CategoricalVector (alias for CategoricalArrays.CategoricalAr
+ray{T, 1} where T)
 ```
 
 
@@ -332,8 +333,8 @@ serially, i.e. without using parallel processes.
 ```
 
 ```
-0.002812 seconds (270 allocations: 661.562 KiB)
-  0.001119 seconds (776 allocations: 695.188 KiB)
+0.086743 seconds (284.76 k allocations: 16.725 MiB)
+  0.128204 seconds (73.93 k allocations: 4.776 MiB, 8.89% compilation time)
 JDF.Table((SepalLength = [5.1, 4.9, 4.7, 4.6, 5.0, 5.4, 4.6, 5.0, 4.4, 4.9 
  …  6.7, 6.9, 5.8, 6.8, 6.7, 6.7, 6.3, 6.5, 6.2, 5.9], SepalWidth = [3.5, 3
 .0, 3.2, 3.1, 3.6, 3.9, 3.4, 3.4, 2.9, 3.1  …  3.1, 3.1, 2.7, 3.2, 3.3, 3.0
