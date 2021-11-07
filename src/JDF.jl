@@ -42,6 +42,7 @@ export IsBitsType, eachcol, some_elm, getindex, istable
 include("JDFFile.jl")
 include("type-writer-loader/Bool.jl")
 include("type-writer-loader/Char.jl")
+include("type-writer-loader/DateTime.jl")
 include("type-writer-loader/categorical-arrays.jl")
 include("type-writer-loader/pooled-arrays.jl")
 include("type-writer-loader/Missing.jl")

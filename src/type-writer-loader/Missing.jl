@@ -2,13 +2,11 @@ using Missings: allowmissing
 
 some_elm(::Type{Missing}) = missing
 
-
 # the dispatch for Union{T, Missing}
 # 1. compress the missing
 # 2. and also load the missing
 compress_then_write(b::Vector{Union{T,Missing}}, io) where {T} = begin
-    S = nonmissingtype(eltype(b))
-    b_S = coalesce.(b, some_elm(S))
+    b_S = coalesce.(b, some_elm(T))
 
     metadata = compress_then_write(b_S, io)
 
