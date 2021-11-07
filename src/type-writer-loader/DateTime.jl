@@ -14,6 +14,6 @@
 #     column_loader(DateTime, io, metadata)
 # end
 #
-some_elm(::Type{DateTime}) = DateTime(1)
+some_elm(::Type{DateTime}) = DateTime(2000,1,1,1,1,1)
 
-# turns out DateTime is BLosc Compressable
+# turns out DateTime is BLosc Compressable; no need to do anything

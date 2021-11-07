@@ -83,7 +83,7 @@ function save(outdir::AbstractString, df; verbose = false)
 
     fnl_metadata = (
         names = Tables.columnnames(df),
-        rows = size(df, 1),
+        rows = length(Tables.columns(df)[1]),
         metadatas = metadatas,
         version = v"0.2",
     )
