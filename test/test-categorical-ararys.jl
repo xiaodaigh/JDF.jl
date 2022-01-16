@@ -12,7 +12,7 @@ using Tables
     JDF.save(df, "a3cate.jdf")
     df_loaded_back = JDF.load("a3cate.jdf", cols = [:x2, :x1])
 
-    df2 = DataFrame(df_loaded_back; copycols=true)
+    df2 = DataFrame(df_loaded_back; copycols = true)
     @test size(df2, 2) == 2
     @test size(df2, 1) == 100
     @time df2[!, :x1] isa CategoricalVector{Int}
@@ -27,4 +27,16 @@ end
     JDF.load("iris.jdf")
 
     rm("iris.jdf", force = true, recursive = true)
+end
+
+@testset "CategoricalArray{Union{Missing, String}}" begin
+    # Guard against github 73
+    df2 = DataFrame(sex = categorical(["Male", missing, "Female"]))
+    JDF.save("df2.jdf", df2)
+
+    b = JDF.load("df2.jdf") |> DataFrame
+
+    @test any(ismissing, b.sex)
+
+    rm("df2.jdf", force=true, recursive=true)
 end
