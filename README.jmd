@@ -3,8 +3,8 @@
 JDF is a `DataFrame`s serialization format with the following goals
 * Fast save and load times
 * Compressed storage on disk
-* Enable disk-based data manipulation (not yet achieved; from v0.4.0)
-* Supports machine learning workloads, e.g. mini-batch, sampling (not yet achieved; from v0.4.0)
+* Enable disk-based data manipulation (not yet achieved)
+* Supports machine learning workloads, e.g. mini-batch, sampling (not yet achieved)
 
 JDF.jl is the Julia pacakge for all things related to JDF.
 
