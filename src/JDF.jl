@@ -1,4 +1,3 @@
-__precompile__(true)
 module JDF
 
 using Blosc: Blosc
@@ -11,27 +10,18 @@ using StatsBase: rle, inverse_rle, countmap, sample
 
 import Base: show, getindex, setindex!, eltype, names
 
-using Base: size#, @v_str, >=, include, VERSION
+using Base: size
 
 using Serialization: serialize, deserialize
 
-if VERSION >= v"1.3.0"
-    import Base.Threads: @spawn
-else
-    macro spawn(_)
-        println("JDF: parallel save/load do not work in < Julia 1.3")
-    end
-end
+
+import Base.Threads: @spawn
 
 function __init__()
-    if VERSION >= v"1.3.0"
-        Blosc.set_num_threads(Threads.nthreads())
-    else
-        Blosc.set_num_threads(isdefined(Sys, :CPU_CORES) ? Sys.CPU_CORES : Sys.CPU_THREADS)
-    end
+    Blosc.set_num_threads(Threads.nthreads())
 end
 
-export savejdf, loadjdf, ssavejdf, sloadjdf#, save, load
+export savejdf, loadjdf
 export column_loader, column_loader!
 export type_compress!, type_compress
 export compress_then_write
@@ -64,9 +54,5 @@ include("type_compress.jl")
 include("metadata.jl")
 include("eachcol.jl")
 include("Tables.jl")
-
-# Blosc.set_num_threads(6)
-
-
 
 end # module

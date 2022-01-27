@@ -51,10 +51,6 @@ save(df, outdir::AbstractString; kwargs...) = save(outdir, df; kwargs...)
 function save(outdir::AbstractString, df; verbose = false)
     @assert Tables.istable(df)
 
-    if VERSION < v"1.3.0-rc1"
-        return ssavejdf(outdir, df)
-    end
-
     pmetadatas = Any[missing for i = 1:length(Tables.columnnames(df))]
 
     if !isdir(outdir)
@@ -95,37 +91,6 @@ function save(outdir::AbstractString, df; verbose = false)
     JDFFile(outdir)
 end
 
-"""
-    Serially save a Tables.jl compatible table to the `outdir`
-"""
-function ssave(outdir::AbstractString, df)
-    colnames = Tables.columnnames(df)
-    pmetadatas = Any[missing for i = 1:length(colnames)]
-
-    if !isdir(outdir)
-        mkpath(outdir)
-    end
-
-    for i = 1:length(colnames)
-        io = BufferedOutputStream(open(joinpath(outdir, string(colnames[i])), "w"))
-        pmetadatas[i] = compress_then_write(Tables.getcolumn(df, colnames[i]), io)
-        close(io)
-    end
-
-
-    fnl_metadata = (
-        names = colnames,
-        rows = size(df, 1),
-        metadatas = pmetadatas,
-        version = v"0.2",
-    )
-
-    open(joinpath(outdir, "metadata.jls"), "w") do io
-        serialize(io, fnl_metadata)
-    end
-    JDFFile(outdir)
-end
-
 # figure out from metadata how much space is allocated
 """ Get tthe number of bytes used by the file"""
 get_bytes(metadata) = begin
@@ -143,4 +108,3 @@ end
 hasfieldnames(::Type{T}) where {T} = fieldnames(T) >= 1
 
 savejdf(args...; kwargs...) = save(args...; kwargs...)
-ssavejdf(args...; kwargs...) = ssave(args...; kwargs...)
