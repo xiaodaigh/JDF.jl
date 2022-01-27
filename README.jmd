@@ -138,14 +138,6 @@ names(jdf"plsdel.jdf") # [:a, :b]
 rm("plsdel.jdf", force = true, recursive = true)
 ```
 
-### Save and load serially
-You can use the `ssavejdf` and `sloadjdf` function to save a `DataFrame`
-serially, i.e. without using parallel processes.
-```julia
-@time jdffile = ssavejdf("iris.jdf", a)
-@time jdffile = sloadjdf("iris.jdf")
-```
-
 ### Additional functionality: In memory `DataFrame` compression
 `DataFrame` sizes are out of control. A 2GB CSV file can easily take up 10GB in
 RAM. One can use the function `type_compress!(df)`  to compress any

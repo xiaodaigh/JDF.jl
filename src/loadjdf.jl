@@ -21,32 +21,13 @@ load(indir; cols = Symbol[], verbose = false) = begin
         end
     end
 
-    result_vectors = load_columns(indir; cols = cols, verbose = verbose)
+    cols_in_loaded_order, result_vectors = load_columns(indir; cols = cols, verbose = verbose)
 
-    Table(NamedTuple{Tuple(Symbol.(cols))}(result_vectors))
+    Table(NamedTuple{Tuple(Symbol.(cols_in_loaded_order))}(result_vectors))
 end
 
 load(jdf::JDFFile; args...) = load(path(jdf); args...)
-sload(jdf::JDFFile; args...) = sload(path(jdf); args...)
 
-# load the data from file with a schema
-function sload(indir; cols = Symbol[], verbose = false)
-    cols = string.(cols)
-    metadatas = jdfmetadata(indir)
-
-    # TODO simplify this
-    if length(cols) == 0
-        cols = string.(metadatas.names)
-    else
-        scmn = setdiff(cols, string.(metadatas.names))
-        if length(scmn) > 0
-            throw("columns $(reduce((x,y) -> string(x) * ", " * string(y), scmn)) are not available, please ensure you have spelt them correctly")
-        end
-    end
-
-    result_vectors = sload_columns(indir; cols = cols, verbose = verbose)
-    Table(NamedTuple{Tuple(Symbol.(cols))}(result_vectors))
-end
 
 loadjdf(args...; kwargs...) = load(args...; kwargs...)
-sloadjdf(args...; kwargs...) = sload(args...; kwargs...)
+
