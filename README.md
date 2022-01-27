@@ -34,7 +34,6 @@ first(a, 2)
 ```
 
 ```
-[ Info: Precompiling JDF [babc3d20-cd49-4f60-a736-a8f9c08892d3]
 2×5 DataFrame
  Row │ SepalLength  SepalWidth  PetalLength  PetalWidth  Species
      │ Float64      Float64     Float64      Float64     Cat…
@@ -57,9 +56,10 @@ Julia 1.3. For Julia < 1.3, it saves and loads using one thread only.
 ```
 
 ```
-0.740554 seconds (1.72 M allocations: 94.193 MiB, 1.98% gc time)
-  1.788809 seconds (4.51 M allocations: 290.662 MiB, 4.51% gc time, 37.65% 
-compilation time)
+0.091923 seconds (157.33 k allocations: 9.226 MiB, 98.89% compilation tim
+e)
+  0.165332 seconds (197.31 k allocations: 11.476 MiB, 98.49% compilation ti
+me)
 150×5 DataFrame
  Row │ SepalLength  SepalWidth  PetalLength  PetalWidth  Species
      │ Float64      Float64     Float64      Float64     Cat…
@@ -110,26 +110,26 @@ a2_selected = DataFrame(JDF.load("iris.jdf", cols = [:Species, :SepalLength, :Pe
 
 ```
 150×3 DataFrame
- Row │ Species  SepalLength  PetalWidth
-     │ Float64  Float64      Cat…
-─────┼──────────────────────────────────
-   1 │     5.1          0.2  setosa
-   2 │     4.9          0.2  setosa
-   3 │     4.7          0.2  setosa
-   4 │     4.6          0.2  setosa
-   5 │     5.0          0.2  setosa
-   6 │     5.4          0.4  setosa
-   7 │     4.6          0.3  setosa
-   8 │     5.0          0.2  setosa
-  ⋮  │    ⋮          ⋮           ⋮
- 144 │     6.8          2.3  virginica
- 145 │     6.7          2.5  virginica
- 146 │     6.7          2.3  virginica
- 147 │     6.3          1.9  virginica
- 148 │     6.5          2.0  virginica
- 149 │     6.2          2.3  virginica
- 150 │     5.9          1.8  virginica
-                        135 rows omitted
+ Row │ SepalLength  PetalWidth  Species
+     │ Float64      Float64     Cat…
+─────┼────────────────────────────────────
+   1 │         5.1         0.2  setosa
+   2 │         4.9         0.2  setosa
+   3 │         4.7         0.2  setosa
+   4 │         4.6         0.2  setosa
+   5 │         5.0         0.2  setosa
+   6 │         5.4         0.4  setosa
+   7 │         4.6         0.3  setosa
+   8 │         5.0         0.2  setosa
+  ⋮  │      ⋮           ⋮           ⋮
+ 144 │         6.8         2.3  virginica
+ 145 │         6.7         2.5  virginica
+ 146 │         6.7         2.3  virginica
+ 147 │         6.3         1.9  virginica
+ 148 │         6.5         2.0  virginica
+ 149 │         6.2         2.3  virginica
+ 150 │         5.9         1.8  virginica
+                          135 rows omitted
 ```
 
 
@@ -146,7 +146,7 @@ jdf"path/to/JDF.jdf"
 ```
 
 ```
-JDF.JDFFile{String}("path/to/JDF.jdf")
+JDFFile{String}("path/to/JDF.jdf")
 ```
 
 
@@ -159,7 +159,7 @@ JDFFile(path_to_JDF)
 ```
 
 ```
-JDF.JDFFile{String}("path/to/JDF.jdf")
+JDFFile{String}("path/to/JDF.jdf")
 ```
 
 
@@ -224,7 +224,7 @@ Tables.columns(ajdf)
 ```
 
 ```
-JDF.JDFFile{String}("iris.jdf")
+JDFFile{String}("iris.jdf")
 ```
 
 
@@ -320,34 +320,6 @@ names(jdf"plsdel.jdf") # [:a, :b]
 # clean up
 rm("plsdel.jdf", force = true, recursive = true)
 ```
-
-
-
-
-### Save and load serially
-You can use the `ssavejdf` and `sloadjdf` function to save a `DataFrame`
-serially, i.e. without using parallel processes.
-```julia
-@time jdffile = ssavejdf("iris.jdf", a)
-@time jdffile = sloadjdf("iris.jdf")
-```
-
-```
-0.086743 seconds (284.76 k allocations: 16.725 MiB)
-  0.128204 seconds (73.93 k allocations: 4.776 MiB, 8.89% compilation time)
-JDF.Table((SepalLength = [5.1, 4.9, 4.7, 4.6, 5.0, 5.4, 4.6, 5.0, 4.4, 4.9 
- …  6.7, 6.9, 5.8, 6.8, 6.7, 6.7, 6.3, 6.5, 6.2, 5.9], SepalWidth = [3.5, 3
-.0, 3.2, 3.1, 3.6, 3.9, 3.4, 3.4, 2.9, 3.1  …  3.1, 3.1, 2.7, 3.2, 3.3, 3.0
-, 2.5, 3.0, 3.4, 3.0], PetalLength = [1.4, 1.4, 1.3, 1.5, 1.4, 1.7, 1.4, 1.
-5, 1.4, 1.5  …  5.6, 5.1, 5.1, 5.9, 5.7, 5.2, 5.0, 5.2, 5.4, 5.1], PetalWid
-th = [0.2, 0.2, 0.2, 0.2, 0.2, 0.4, 0.3, 0.2, 0.2, 0.1  …  2.4, 2.3, 1.9, 2
-.3, 2.5, 2.3, 1.9, 2.0, 2.3, 1.8], Species = CategoricalArrays.CategoricalV
-alue{String, UInt8}["setosa", "setosa", "setosa", "setosa", "setosa", "seto
-sa", "setosa", "setosa", "setosa", "setosa"  …  "virginica", "virginica", "
-virginica", "virginica", "virginica", "virginica", "virginica", "virginica"
-, "virginica", "virginica"]))
-```
-
 
 
 

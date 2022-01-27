@@ -26,14 +26,7 @@ JDFFile(path_to_JDF)
 
 afile = JDFFile("iris.jdf")
 
-afile[!, :Species] # load Species column
-afile[!, [:Species, :PetalLength]] # load Species and PetalLength column
-
-afile[:, :Species] # load Species column
-afile[:, [:Species, :PetalLength]] # load Species and PetalLength column
-
-@view(afile[!, :Species]) # load Species column
-@view(afile[!, [:Species, :PetalLength]]) # load Species and PetalLength column
+afile[:Species] # load Species column
 
 
 using Tables
@@ -66,20 +59,9 @@ end
 
 using JDF, DataFrames
 df = DataFrame(a = 1:3, b = 1:3)
-savejdf(df, "plsdel.jdf")
-
+JDF.save(df, "plsdel.jdf")
 
 names(jdf"plsdel.jdf") # [:a, :b]
-
-nrow(jdf"plsdel.jdf") # 3
-
-ncol(jdf"plsdel.jdf") # 2
-
-size(jdf"plsdel.jdf") # (3, 2)
-
-size(jdf"plsdel.jdf", 1) # 2
-
-size(jdf"plsdel.jdf", 2) # 3
 
 # clean up
 rm("plsdel.jdf", force = true, recursive = true)
