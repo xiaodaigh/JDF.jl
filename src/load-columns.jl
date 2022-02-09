@@ -6,7 +6,7 @@ load_columns(jdf::JDFFile; args...) = load_columns(path(jdf); args...)
 
 function load_columns(indir; cols = Symbol[], verbose = false)
     # starting from DataFrames.jl 0.21 the colnames are strings
-    cols = string.(cols)
+    cols = collect(string.(cols))
 
     if verbose
         println("loading $indir in parallel")
@@ -17,9 +17,9 @@ function load_columns(indir; cols = Symbol[], verbose = false)
     end
 
     if length(cols) == 0
-        cols = string.(metadatas.names)
+        cols =collect(string.(metadatas.names))
     else
-        scmn = setdiff(cols, string.(metadatas.names))
+        scmn = setdiff(cols, collect(string.(metadatas.names)))
         if length(scmn) > 0
             throw("columns $(reduce((x,y) -> string(x) * ", " * string(y), scmn)) are not available, please ensure you have spelt them correctly")
         end
