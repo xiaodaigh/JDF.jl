@@ -7,7 +7,7 @@ upcheck()
 
 using Weave
 
-weave("../README.jmd", out_path="c:/git/JDF/", doctype="github")
+weave("../README.jmd", out_path="./", doctype="github")
 
 if false
     # debug

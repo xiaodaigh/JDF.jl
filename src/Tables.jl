@@ -41,3 +41,12 @@ Tables.istable(t::Table) = true
 function Base.getindex(t::Table, col::Symbol)
     t.columns[col]
 end
+
+function Base.getindex(t::Table, rows, col::Symbol)
+    t.columns[col][rows]
+end
+
+function Base.getindex(t::Table, rows, ::Colon)
+    # TODO probably not efficient
+    NamedTuple{names(t.columns)}([nt[rows] for nt in t.columns])
+end
