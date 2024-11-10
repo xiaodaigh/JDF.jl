@@ -81,4 +81,6 @@ column_loader(::Type{String}, io, metadata) = begin
 
     #res = StringArray{String, 1}(buffer, vcat(1, cumsum(Blosc.decompress(UInt64, buffer3))[1:end-1]) .-1,  )
     res = StringArray{String,1}(buffer, offsets, lengths)
+
+    res
 end

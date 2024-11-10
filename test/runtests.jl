@@ -4,6 +4,7 @@ using DataFrames
 using Random: randstring
 using WeakRefStrings
 
+include("test-bool.jl")
 include("test-categorical-ararys.jl")
 include("test-stringarray.jl")
 include("test-symbol.jl")
@@ -12,6 +13,7 @@ include("test-eachcol.jl")
 include("test-ZonedDateTime.jl")
 include("test-substring.jl")
 include("test-date-w-missing.jl")
+
 
 @testset "JDF.jl parallel" begin
     df = DataFrame([collect(1:100) for i = 1:3000], :auto)
